@@ -135,6 +135,28 @@
         function createPipeline(dataConfig) {
 
         }
+
+        sway.actions = {
+            // Show the splashscreen for the installation
+            "splash": function () {
+                clientState.changeState('splash');
+            },
+            // Show intro message
+            "intro": function () {},
+            // Confirm user wants to join
+            "confirm": function () {},
+            // Select shape for the user
+            "shape": function () {},
+            // Calibrate user into the system
+            "calibrate": function (data) {
+            },
+            // Notify user that they are waiting
+            "queue": function () {},
+            // Enter play state
+            "play": function () {},
+            // Quit the interation
+            "quit": function () {}
+        };
     </script>
 
 
