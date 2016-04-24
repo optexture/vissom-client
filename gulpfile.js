@@ -74,8 +74,19 @@ gulp.task('default', ['process-scss', 'serve-browsersync', 'watch']);
  */
 gulp.task('copy-deps', function () {
     return gulp.src([
+        '../shui/lib/engine.io.js',
         '../shui/lib/shui.deps.js',
         '../shui/dist/shui.js'
     ])
         .pipe(gulp.dest('lib'));
+});
+
+/**
+ * Copy debug files from other projects
+ */
+gulp.task('copy-debug', function () {
+    return gulp.src([
+            '../shui/client/shui-debug.html'
+        ])
+        .pipe(gulp.dest('client'));
 });
