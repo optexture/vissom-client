@@ -1,0 +1,64 @@
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100vh;
+  width: 100vw;
+}
+
+body {
+  color: $color-white;
+  background-color: $color-black;
+  margin: 0;
+
+  font: {
+    family: $font-base;
+    size: $size-text-regular;
+    weight: $weight-regular;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: $color-turquoise;
+  font-weight: $weight-bold;
+}
+
+p {
+  margin-bottom: 2em;
+  text-align: center;
+}
+
+section {
+  display: none;
+  visibility: hidden;
+
+  height: 100vh;
+  padding: 1.5em;
+
+  &.current-state {
+    visibility: visible;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+nav {
+  flex-shrink: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+article {
+  flex-grow: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

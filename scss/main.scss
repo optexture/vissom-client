@@ -1,0 +1,122 @@
+@import 'variables';
+@import 'base';
+@import 'button';
+
+h1 {
+  text-align: center;
+  flex-grow: 1;
+}
+
+nav {
+  button {
+    @include setButtonColor($button-color, 1.2em, $color-black);
+  }
+}
+
+.info {
+  article {
+    margin-top: 1em;
+    flex-grow: 1;
+  }
+
+  nav {
+    margin-top: 1em;
+  }
+
+  p {
+    margin: 0 0 2em;
+
+    text-align: left;
+    font-size: 0.95em;
+
+    &:last-of-type {
+      flex-grow: 1;
+    }
+  }
+}
+
+.queue {
+  p {
+    &:first-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  div.queue--number {
+    font-size: 5em;
+    margin: 0.2em 0;
+    text-align: center;
+  }
+}
+
+.paint {
+  article {
+    width: 100%;
+  }
+
+  button.control {
+    @include setButtonColor($color-purple, 1.2em, $color-black);
+    padding: 4em 3em;
+
+    transition: border-color 0.4s;
+
+    &:active {
+      border-color: lighten($color-purple, 20%);
+      box-shadow: $color-white 0 0 0 2px;
+    }
+
+    &.active {
+      animation-duration: 3s;
+      animation-delay: 1s;
+      animation-name: pulse;
+      animation-iteration-count: infinite;
+    }
+  }
+
+  div.control {
+    width: 100%;
+
+    text-align: center;
+  }
+
+  .user--shape {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 1em;
+
+
+    div {
+      &:first-of-type {}
+      &:last-of-type {
+        padding: 0;
+        height: 1.5em;
+        width: 1.5em;
+
+        margin-left: 0.25em;
+        font: {
+          size: 2em;
+          weight: $weight-bold;
+        }
+      }
+    }
+  }
+}
+
+// todo: remove
+.fpo {
+  padding: 2em;
+  border: 2px solid $color-white;
+  background-color: #777;
+  color: $color-black;
+  font-weight: $weight-bold;
+
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0% { border-color: lighten($color-purple, 0%) }
+  60% { border-color: lighten($color-purple, 40%) }
+  100% { border-color: lighten($color-purple, 0%) }
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="width=device-width,initial-scale=1.0" name="viewport">
+    <meta charset="utf-8">
+    <title>.: vissom :.</title>
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<section id="landing" class="current-state">
+    <header><div class="fpo">Logo</div></header>
+
+    <h1>Welcome to Visualize Somerville 2</h1>
+
+    <nav>
+        <button onclick="clientState.changeState('info')">Want to learn more?</button>
+        <button onclick="clientState.changeState('queue')">Want to play?</button>
+    </nav>
+</section>
+
+<section id="info" class="info">
+    <article>
+        <p>Imagine the feeling you get when you hold an ice cube tight, that combination of sting and ache, except imagine it all over your nearly nude body. Battling my long-­ingrained instincts never to run at a swimming pool, I fell into a kind of brisk walk-trot, aiming for the large set of interconnected hot tubs in the center of the complex. I’m sure I looked ridiculous. The good news: I’d never been less concerned about my appearance while wearing almost nothing in public.</p>
+
+        <p>Small snowflakes glittered in the sky, which at 4 p.m. was already darkening toward dusk. I reached the largest hot tub and sank to my chin. For one glorious moment, I felt my mind go blank: There was just my body, my big, stupid body in its stupid bathing suit, enveloped in warmth, the cold wind on my ears only heightening my delight.</p>
+    </article>
+
+    <nav><button onclick="clientState.changeState('landing')">Continue</button></nav>
+</section>
+
+<section id="queue" class="queue">
+    <article>
+        <p>There are a few people ahead of you right now. You are number</p>
+        <div class="queue--number">5</div>
+        <p>in line. We will get you painting as soon as we can!</p>
+    </article>
+
+    <button onclick="clientState.changeState('calibration')">dummy button to calibration</button>
+</section>
+
+<section id="calibration">
+    <header><div class="fpo">user shape</div></header>
+    <article>
+        <p>Okay! Let's get your device calibrated.</p>
+        <p>Please point your phone at the shape shown above and then click the button below.</p>
+    </article>
+    <nav><button onclick="clientState.changeState('start')">Continue</button></nav>
+</section>
+
+<section id="start">
+    <article>
+        <p>Okay! We have calibrated your phone. The crosshair shows you where your brush is. Your shape is:</p>
+
+        <div style="display: flex; justify-content: center;"><div class="fpo">user shape</div></div>
+
+        <p>To paint: click and hold the <strong>paint</strong> button to create!</p>
+    </article>
+    <nav><button onclick="clientState.changeState('paint')">Let's start!</button></nav>
+</section>
+
+<section id="paint" class="paint">
+    <nav>
+        <button onclick="clientState.changeState('goodbye')">Disconnect</button>
+        <button onclick="clientState.changeState('calibration')">Recalibrate</button>
+    </nav>
+
+    <article><button class="control active">Hold to paint</button></article>
+
+    <div class="user--shape">
+        <div>Your shape:</div>
+        <div class="fpo"></div>
+    </div>
+
+    <div class="control fpo">Dot size (slider control)</div>
+
+</section>
+
+<section id="goodbye">
+    <nav>
+        <button onclick="clientState.changeState('info')">Want to learn more?</button>
+        <button onclick="clientState.changeState('queue')">Want to play again?</button>
+    </nav>
+</section>
+
+
+<script type="text/javascript" src="js/viewController.js"></script>
+
+</body>
+</html>

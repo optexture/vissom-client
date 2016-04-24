@@ -1,0 +1,36 @@
+button {
+  width: 100%;
+  margin-bottom: 1em;
+  padding: 0.75em 1.25em;
+  border-radius: 2em;
+  border: 0.2em solid;
+
+  letter-spacing: 0.02em;
+  font-weight: $weight-bold;
+
+  transition: opacity 0.2s;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+@mixin setButtonColor($button-color, $text-size, $text-color: currentColor) {
+  border-color: $button-color;
+  background-color: transparentize($button-color, 0.25);
+  font-size: $text-size;
+
+  transition: background-color 0.2s;
+
+  &:active {
+    background-color: transparentize($button-color, 0.15);
+  }
+}

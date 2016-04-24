@@ -1,7 +1,9 @@
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 
 var autoprefixer = require('gulp-autoprefixer');
 var browserSync = require('browser-sync').create();
+var concat = require('gulp-concat');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var Server = require('karma').Server;
@@ -25,7 +27,7 @@ gulp.task('serve-browsersync', function () {
         open: false,
         port: 3000,
         server: {
-            baseDir: path.dest.build
+            //baseDir: path.dest.build
         }
     });
 });
@@ -52,7 +54,8 @@ gulp.task('process-scss', function () {
         .pipe(sourcemaps.write())
         .pipe(autoprefixer({ browsers: ['last 2 versions', 'Android', 'iOS', 'and_chr', 'and_ff', 'ie_mob', 'bb'] }))
 
-        .pipe(gulp.dest(path.dest.build + 'css/'))
+        //.pipe(gulp.dest(path.dest.build + 'css/'))
+        .pipe(gulp.dest('css/'))
 
         .pipe(browserSync.stream());
 });
@@ -62,8 +65,6 @@ gulp.task('watch', function () {
 });
 
 // todo: concat and minify
-// todo: inject js/css inline into index.html
-
-
+// todo: inject js/css inline into index.html ?
 
 gulp.task('default', ['process-scss', 'serve-browsersync', 'watch']);
