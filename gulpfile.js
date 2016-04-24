@@ -1,9 +1,9 @@
 var gulp = require('gulp');
-var babel = require('gulp-babel');
+//var babel = require('gulp-babel');
 
 var autoprefixer = require('gulp-autoprefixer');
 var browserSync = require('browser-sync').create();
-var concat = require('gulp-concat');
+//var concat = require('gulp-concat');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var Server = require('karma').Server;
@@ -68,3 +68,14 @@ gulp.task('watch', function () {
 // todo: inject js/css inline into index.html ?
 
 gulp.task('default', ['process-scss', 'serve-browsersync', 'watch']);
+
+/**
+ * Copy dependencies from other projects
+ */
+gulp.task('copy-deps', function () {
+    return gulp.src([
+        '../shui/lib/shui.deps.js',
+        '../shui/dist/shui.js'
+    ])
+        .pipe(gulp.dest('lib'));
+});
