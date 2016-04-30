@@ -203,7 +203,7 @@
 
 
 <section id="splash" class="current-state">
-    <header><div class="fpo">Logo</div></header>
+    <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <h1>Welcome to Visualize Somerville 2</h1>
 
@@ -269,6 +269,16 @@
     <div class="control fpo">Dot size (slider control)</div>
 
 </section>
+
+<section id="disco">
+    <p>You've been disconnected due to inactivity. Thanks for playing!</p>
+
+    <svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg>
+    <nav>
+        <button onclick="clientState.changeState('info')">Want to learn more?</button>
+        <button onclick="clientState.changeState('queue')">Want to play again?</button>
+    </nav>
+    </section>
 
 <section id="quit">
     <nav>

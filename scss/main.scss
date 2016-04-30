@@ -2,6 +2,10 @@
 @import 'base';
 @import 'button';
 
+svg.logo {
+  fill: $color-white;
+}
+
 h1 {
   text-align: center;
   flex-grow: 1;
