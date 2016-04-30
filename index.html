@@ -8,120 +8,118 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <script type="text/javascript" src="../lib/engine.io.js"></script>
+    <script type="text/javascript" src="lib/engine.io.js"></script>
     <script type="text/javascript">
         var 水 = {}; // TODO: remove soon
     </script>
-    <script type="text/javascript" src="../lib/shui.deps.js"></script>
-    <script type="text/javascript" src="../dist/shui.js"></script>
+    <script type="text/javascript" src="lib/shui.deps.js"></script>
+    <script type="text/javascript" src="lib/shui.js"></script>
     <script type="text/javascript">
         var multicast = cosinedesign.toolbox.multicast;
     </script>
     <script type="text/javascript">
         var toolbox = cosinedesign.toolbox,
-        delimiter = "|",
-        socket;
+            calibration = {
+                alphaOffset: 0
+            },
+            delimiter = "|",
+            oPipe,
+            socket,
+            state = {
+                paint: false // set to true for active painting
+            };
+            sway.config.url = 'http://192.168.1.10:1000';
+
+        function paint() {
+            state.paint = !state.paint;
+        }
+
         // register motion handlers
-
         sway.oninitialized = multicast(function (res) {
-        var channel = state.channel = res.channel;
-        var plugin = channel[channel.plugin];
-        var orientation = plugin.orientation;
-        var inputConfig = plugin.input;
+            var channel = state.channel = res.channel;
+            var plugin = channel[channel.plugin];
+            var orientation = plugin.orientation;
+            var inputConfig = plugin.input;
 
-        //sway.management.getTimer();
+            //sway.management.getTimer();
 
-        // TODO: need a 'smoothing' pipe entry. Should accept a variance / threshold to stick to. Or maybe max delta?
-        // shui pipe should:
-        //  - throttle and/or smooth
-        //  -
-        // orientation pipe
-        var oPipe = toolbox.pipe(showObject);
+            // TODO: need a 'smoothing' pipe entry. Should accept a variance / threshold to stick to. Or maybe max delta?
+            // shui pipe should:
+            //  - throttle and/or smooth
+            //  -
 
-        //oPipe.next(showObject);
-        socket = state.socket = new sway.Socket({ address: inputConfig.address + ':' + inputConfig.port });
-        socket.connect();
+            //oPipe.next(showObject);
+            socket = state.socket = new sway.Socket({ address: inputConfig.address + ':' + inputConfig.port });
+            socket.connect();
 
-        oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'scale', orientation));
+            // orientation pipe
+            oPipe = toolbox.pipe(showObject);
+            // TODO: add calibration handler
+            oPipe.add(function (o) {
+                // this is going to be o.alpha = o.alpha - calibration.alphaOffset;
+                return o;
+            });
+            oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'scale', orientation));
+            oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'ratioPolar', orientation));
 
-        // add a send-to-sway-realtime handler/pipe
-        var sendPipe = toolbox.pipe(function (data) {
-        // translate the data first into the socket packet
-        // TODO: make a more-compressed packet ... but for now...
-        socket.send(channel.name + delimiter + data.alpha + delimiter + data.beta + delimiter + data.gamma );
-        //var packet = { channel: channel.name, orientation: data };
-        //socket.send(packet);
-        return data;
+            // add a send-to-sway-realtime handler/pipe
+            var sendPipe = toolbox.pipe(function (data) {
+                if (!data) return;
+                // translate the data first into the socket packet
+                // TODO: make a more-compressed packet ... but for now...
+                socket.send(channel.name + delimiter + data.alpha + delimiter + data.beta + delimiter + data.gamma );
+                //var packet = { channel: channel.name, orientation: data };
+                //socket.send(packet);
+                return data;
+            });
+
+            //sendPipe.next(showData);
+
+            // add a throttle for sPipe
+            var throttle = toolbox.throttle(sendPipe);
+            throttle.interval(250);
+            // add the pipe to
+            oPipe.next(throttle);
+
+            // TODO: add a timing handler
+            // TODO: add an output handler
+
+            function showData(o) {
+                var out = "<br>"
+                    + "Channel " + channel.name + "</br>"
+                    + "alpha (yaw) " + o.alpha + "</br>"
+                    + "beta (pitch) " + o.beta + "</br>"
+                    + "gamma (roll) " + o.gamma + "</br>"
+                    + "absolute " + o.absolute + "</br>"
+                    + "</div>";
+
+                divOutput.innerHTML = out;
+                return o;
+            }
+
+            function clearData(o) {
+                divOutput.innerHTML = '';
+                return o;
+            }
+
+            function showObject(o) {
+                //divInput.innerHTML = JSON.stringify(o);
+                return o;
+            }
+
+            // register pipe as motion handler
+            //shui.motion.onOrientation = oPipe;
+
+            // initialize motion
+            // TODO: Should this be in an oninitialize event?
+            shui.motion.init();
+
+            //sway.management.updateTimer();
+
         });
-        sendPipe.next(showData);
-
-        // add a throttle for sPipe
-        var throttle = toolbox.throttle(sendPipe);
-        throttle.interval(50);
-        // add the pipe to
-        oPipe.next(throttle);
-
-        // TODO: add a timing handler
-        // TODO: add an output handler
-
-        function showData(o) {
-        var out = "<br>"
-        + "Channel " + channel.name + "</br>"
-        + "alpha (yaw) " + o.alpha + "</br>"
-        + "beta (pitch) " + o.beta + "</br>"
-        + "gamma (roll) " + o.gamma + "</br>"
-        + "absolute " + o.absolute + "</br>"
-        + "</div>";
-
-        divOutput.innerHTML = out;
-        return o;
-        }
-
-        function clearData(o) {
-        divOutput.innerHTML = '';
-        return o;
-        }
-        function showObject(o) {
-        divInput.innerHTML = JSON.stringify(o);
-        return o;
-        }
-
-
-
-        // register pipe as motion handler
-        shui.motion.onOrientation = oPipe;
-
-        // initialize motion
-        // TODO: Should this be in an oninitialize event?
-        shui.motion.init();
-
-        //sway.management.updateTimer();
-
-        });
-
-        sway.config.url = 'http://192.168.1.10:1000';
 
         // new calibrate action
-        sway.actions.calibrate = function (data) {
-        // generate a position within space
-        var space = {
-        x: { min: 100, max: 240 },
-        y: { min: -20, max: 75 }
-        };
-
-        var spaceXSize = space.x.max - space.x.min;
-        var spaceXIntervals = spaceXSize / 10;
-        // take sway user id and multiply that by some increment within space x
-        var targetX = spaceXIntervals * sway.user.channel.realtime.output.id;
-
-        // send generated position (one ping only, please)
-        socket.send(channel.name + delimiter + data.alpha + delimiter + data.beta + delimiter + data.gamma );
-
-        // TODO: Make calibrate notification visible
-
-        // TODO: assign onClick of button to handler
-
-        };
+        // sway.actions.calibrate = function (data) {};
 
         // initialize sway (connects to server)
         sway.init();
@@ -132,30 +130,74 @@
 
         // Sway needs to send us config information on what data we're sending, and where.
         // event->throttle->transform->send
-        function createPipeline(dataConfig) {
-
-        }
+//        function createPipeline(dataConfig) {
+//
+//        }
 
         sway.actions = {
             // Show the splashscreen for the installation
             "splash": function () {
                 clientState.changeState('splash');
             },
-            // Show intro message
-            "intro": function () {},
+            // Show info message
+            "info": function () {
+                clientState.changeState('info');
+            },
             // Confirm user wants to join
-            "confirm": function () {},
+            "confirm": function () {
+                clientState.changeState('confirm');
+            },
             // Select shape for the user
-            "shape": function () {},
+            //"shape": function () {},
             // Calibrate user into the system
             "calibrate": function (data) {
+                // generate a position within space
+                var space = {
+                    x: { min: 100, max: 240 },
+                    y: { min: -20, max: 75 }
+                };
+
+                var spaceXSize = space.x.max - space.x.min;
+                var spaceXIntervals = spaceXSize / 10;
+                // take sway user id and multiply that by some increment within space x
+                var targetX = spaceXIntervals * sway.user.channel.realtime.output.id;
+
+                // send generated position (one ping only, please)
+                socket.send(state.channel.name + delimiter + targetX + delimiter + 45 + delimiter + 0 );
+
+                // Make calibrate notification visible
+                clientState.changeState('calibrate');
+
+                // add a pipe specific to calibration
+                var calPipe = toolbox.pipe(function (o) {
+                    calibration.alpha = o.alpha;
+                });
+
+                shui.motion.onOrientation = calPipe;
             },
+            "calibrateComplete": function () {
+                // Cut off the motion handler so the last value is now the calibration info.
+                shui.motion.onOrientation = function () {};
+                clientState.changeState('queue');
+            },
+            // Calibration
+            // - we put one shape onscreen at targetX1; record that angle.
+            // - we put same shape at targetX2; record that angle.
+
             // Notify user that they are waiting
-            "queue": function () {},
+            "queue": function () {
+                //clientState.changeState('queue');
+            },
             // Enter play state
-            "play": function () {},
+            "play": function () {
+                clientState.changeState('play');
+                // Now assign the play pipe to the orientation handler
+                shui.motion.onOrientation = oPipe;
+            },
             // Quit the interation
-            "quit": function () {}
+            "quit": function () {
+                clientState.changeState('quit');
+            }
         };
     </script>
 
@@ -167,7 +209,7 @@
 
     <nav>
         <button onclick="clientState.changeState('info')">Want to learn more?</button>
-        <button onclick="clientState.changeState('queue')">Want to play?</button>
+        <button onclick="sway.actions.play()">Want to play?</button>
     </nav>
 </section>
 
@@ -188,16 +230,16 @@
         <p>in line. We will get you painting as soon as we can!</p>
     </article>
 
-    <button onclick="clientState.changeState('calibration')">dummy button to calibration</button>
+    <button onclick="sway.actions.calibrate()">dummy button to calibration</button>
 </section>
 
-<section id="calibration">
+<section id="calibrate">
     <header><div class="fpo">user shape</div></header>
     <article>
         <p>Okay! Let's get your device calibrated.</p>
         <p>Please point your phone at the shape shown above and then click the button below.</p>
     </article>
-    <nav><button onclick="clientState.changeState('confirm')">Continue</button></nav>
+    <nav><button onclick="sway.actions.calibrateComplete()">Continue</button></nav>
 </section>
 
 <section id="confirm">
@@ -217,7 +259,7 @@
         <button onclick="clientState.changeState('calibration')">Recalibrate</button>
     </nav>
 
-    <article><button class="control active">Hold to paint</button></article>
+    <article><button class="control active" onclick="paint()">Hold to paint</button></article>
 
     <div class="user--shape">
         <div>Your shape:</div>
