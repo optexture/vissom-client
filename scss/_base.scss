@@ -32,12 +32,13 @@ p {
 section {
   display: none;
   visibility: hidden;
+  opacity: 0;
 
   height: 100vh;
   padding: 1.5em;
 
   &.current-state {
-    visibility: visible;
+    animation: fadeIn 0.3s ease-in forwards;
 
     display: flex;
     flex-direction: column;
@@ -61,4 +62,11 @@ article {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    visibility: visible;
+  }
 }

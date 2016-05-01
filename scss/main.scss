@@ -1,6 +1,7 @@
 @import 'variables';
 @import 'base';
 @import 'button';
+@import "loader";
 
 svg.logo {
   fill: $color-white;
@@ -9,6 +10,7 @@ svg.logo {
 h1 {
   text-align: center;
   flex-grow: 1;
+  margin-top: 2em;
 }
 
 nav {
@@ -41,14 +43,12 @@ nav {
 
 .queue {
   p {
-    &:first-of-type {
-      margin-bottom: 0;
-    }
+    margin: 1em 0;
   }
 
   div.queue--number {
-    font-size: 5em;
-    margin: 0.2em 0;
+    font-size: 4em;
+    margin: 0.5em 0;
     text-align: center;
   }
 }
@@ -62,7 +62,7 @@ nav {
     @include setButtonColor($color-purple, 1.2em, $color-black);
     padding: 4em 3em;
 
-    transition: border-color 0.4s;
+    transition: border-color 0.4s, box-shadow 0.3s;
 
     &:active {
       border-color: lighten($color-purple, 20%);

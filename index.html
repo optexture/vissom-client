@@ -226,8 +226,17 @@
 <section id="queue" class="queue">
     <article>
         <p>There are a few people ahead of you right now. You are number</p>
-        <div class="queue--number">5</div>
+
+        <div class="waiting">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+            </svg>
+
+            <div class="queue--number">5</div>
+        </div>
+
         <p>in line. We will get you painting as soon as we can!</p>
+
     </article>
 
     <button onclick="sway.actions.calibrate()">dummy button to calibration</button>
