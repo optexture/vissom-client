@@ -1,6 +1,14 @@
 var clientState = (function () {
     var sectionList = document.querySelectorAll('section');
 
+    var calibrationSteps = {
+        step1: document.getElementById('calibrate1'),
+        step2: document.getElementById('calibrate2'),
+        step3: document.getElementById('calibrate3')
+    };
+
+    var calibrationCurrentStep = 'step1';
+
     /**
      * Add `current-state` css class to the declared section of the application, and remove class from all others
      * 
@@ -29,8 +37,44 @@ var clientState = (function () {
         });
     };
 
+    /**
+     * Click handler - walk user through calibration steps
+     */
+    var userCalibration = function () {
+        calibrationCurrentStep = 'step1';
+
+        if (calibrationCurrentStep === 'step1') {
+
+            calibrationSteps.step1.classList.remove('current-step');
+            calibrationSteps.step2.classList.add('current-step');
+
+            calibrationCurrentStep = 'step2';
+
+        } else if (calibrationCurrentStep === 'step2') {
+
+            calibrationSteps.step2.classList.remove('current-step');
+            calibrationSteps.step3.classList.add('current-step');
+
+            calibrationCurrentStep = 'step3';
+
+        } else if (calibrationCurrentStep === 'step3') {
+
+            clientState.changeView('confirm');
+
+            calibrationSteps.step3.classList.remove('current-step');
+            calibrationSteps.step1.classList.add('current-step');
+
+            calibrationCurrentStep = 'step1';
+        }
+
+
+
+
+    };
+
     return {
-        changeView: changeView
+        changeView: changeView,
+        userCalibration: userCalibration
     }
 })();
 
