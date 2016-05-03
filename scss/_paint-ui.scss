@@ -1,0 +1,96 @@
+
+.play {
+  article {
+    width: 100%;
+  }
+
+  button.control {
+    @include setButtonColor($color-purple, 1.2em, $color-black);
+    padding: 4em 3em;
+
+    transition: border-color 0.4s, box-shadow 0.3s;
+
+    &:active {
+      border-color: lighten($color-purple, 20%);
+      box-shadow: $color-white 0 0 0 2px;
+    }
+
+    &.active {
+      animation-duration: 3s;
+      animation-delay: 1s;
+      animation-name: pulse;
+      animation-iteration-count: infinite;
+    }
+  }
+
+  div.control {
+    width: 100%;
+    position: relative;
+
+    label {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 1px;
+
+      opacity: 0.8;
+    }
+
+    input[type='range'] {
+      -webkit-appearance: none;
+      width: 100%;
+      background-color: $color-white;
+    }
+
+    input[type='range']::-webkit-slider-runnable-track {
+      height: 5em;
+      background-image: linear-gradient(to bottom right, #333, #333 50%, transparent 50%, transparent),linear-gradient(to left, $color-black 2px, transparent 0);
+      background-size: 100% 100%, 8% 100%;
+      background-position: right;
+    }
+
+    input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      position: relative;
+      top: -1em;
+      border: 3px solid lighten($color-purple, 5%);
+      border-radius: 1em;
+      height: 7em;
+      width: 5em;
+      background: $color-purple;
+    }
+
+    input[type='range']:focus {
+      outline: none;
+    }
+  }
+
+  .user--shape {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 2em;
+
+    div {
+      &:last-of-type {
+        padding: 0;
+        height: 1.5em;
+        width: 1.5em;
+
+        margin-left: 0.25em;
+        font: {
+          size: 2em;
+          weight: $weight-bold;
+        }
+      }
+    }
+  }
+}
+
+
+@keyframes pulse {
+  0% { border-color: lighten($color-purple, 0%) }
+  60% { border-color: lighten($color-purple, 40%) }
+  100% { border-color: lighten($color-purple, 0%) }
+}
