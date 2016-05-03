@@ -137,15 +137,15 @@
         sway.actions = {
             // Show the splashscreen for the installation
             "splash": function () {
-                clientState.changeState('splash');
+                clientState.changeView('splash');
             },
             // Show info message
             "info": function () {
-                clientState.changeState('info');
+                clientState.changeView('info');
             },
             // Confirm user wants to join
             "confirm": function () {
-                clientState.changeState('confirm');
+                clientState.changeView('confirm');
             },
             // Select shape for the user
             //"shape": function () {},
@@ -166,7 +166,7 @@
                 socket.send(state.channel.name + delimiter + targetX + delimiter + 45 + delimiter + 0 );
 
                 // Make calibrate notification visible
-                clientState.changeState('calibrate');
+                clientState.changeView('calibrate');
 
                 // add a pipe specific to calibration
                 var calPipe = toolbox.pipe(function (o) {
@@ -178,7 +178,7 @@
             "calibrateComplete": function () {
                 // Cut off the motion handler so the last value is now the calibration info.
                 shui.motion.onOrientation = function () {};
-                clientState.changeState('queue');
+                clientState.changeView('queue');
             },
             // Calibration
             // - we put one shape onscreen at targetX1; record that angle.
@@ -186,17 +186,17 @@
 
             // Notify user that they are waiting
             "queue": function () {
-                //clientState.changeState('queue');
+                //clientState.changeView('queue');
             },
             // Enter play state
             "play": function () {
-                clientState.changeState('play');
+                clientState.changeView('play');
                 // Now assign the play pipe to the orientation handler
                 shui.motion.onOrientation = oPipe;
             },
             // Quit the interation
             "quit": function () {
-                clientState.changeState('quit');
+                clientState.changeView('quit');
             }
         };
     </script>
@@ -208,7 +208,7 @@
     <h1>Welcome to Visualize Somerville 2</h1>
 
     <nav>
-        <button onclick="clientState.changeState('info')">Want to learn more?</button>
+        <button onclick="clientState.changeView('info')">Want to learn more?</button>
         <button onclick="sway.actions.play()">Want to play?</button>
     </nav>
 </section>
@@ -220,7 +220,7 @@
         <p>Small snowflakes glittered in the sky, which at 4 p.m. was already darkening toward dusk. I reached the largest hot tub and sank to my chin. For one glorious moment, I felt my mind go blank: There was just my body, my big, stupid body in its stupid bathing suit, enveloped in warmth, the cold wind on my ears only heightening my delight.</p>
     </article>
 
-    <nav><button onclick="clientState.changeState('splash')">Continue</button></nav>
+    <nav><button onclick="clientState.changeView('splash')">Continue</button></nav>
 </section>
 
 <section id="queue" class="queue">
@@ -259,13 +259,13 @@
 
         <p>To paint: click and hold the <strong>paint</strong> button to create!</p>
     </article>
-    <nav><button onclick="clientState.changeState('play')">Let's start!</button></nav>
+    <nav><button onclick="clientState.changeView('play')">Let's start!</button></nav>
 </section>
 
 <section id="play" class="play">
     <nav>
-        <button onclick="clientState.changeState('quit')">Disconnect</button>
-        <button onclick="clientState.changeState('calibration')">Recalibrate</button>
+        <button onclick="clientState.changeView('quit')">Disconnect</button>
+        <button onclick="clientState.changeView('calibration')">Recalibrate</button>
     </nav>
 
     <article><button class="control active" onclick="paint()">Hold to paint</button></article>
@@ -287,15 +287,15 @@
 
     <svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg>
     <nav>
-        <button onclick="clientState.changeState('info')">Want to learn more?</button>
-        <button onclick="clientState.changeState('queue')">Want to play again?</button>
+        <button onclick="clientState.changeView('info')">Want to learn more?</button>
+        <button onclick="clientState.changeView('queue')">Want to play again?</button>
     </nav>
     </section>
 
 <section id="quit">
     <nav>
-        <button onclick="clientState.changeState('info')">Want to learn more?</button>
-        <button onclick="clientState.changeState('queue')">Want to play again?</button>
+        <button onclick="clientState.changeView('info')">Want to learn more?</button>
+        <button onclick="clientState.changeView('queue')">Want to play again?</button>
     </nav>
 </section>
 

@@ -4,15 +4,15 @@ var clientState = (function () {
     /**
      * Add `current-state` css class to the declared section of the application, and remove class from all others
      * 
-     * @param stateName string
+     * @param viewName string
      */
-    var changeState = function (stateName) {
+    var changeView = function (viewName) {
 
         Object.keys(sectionList).forEach(function (key) {
             var currentSection = sectionList[key];
 
             // add "current-state" class to the selected state
-            if (currentSection.id === stateName) {
+            if (currentSection.id === viewName) {
                 if (currentSection.classList) {
                     currentSection.classList.add('current-state');
                 } else {
@@ -30,7 +30,7 @@ var clientState = (function () {
     };
 
     return {
-        changeState: changeState
+        changeView: changeView
     }
 })();
 
