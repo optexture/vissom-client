@@ -41,7 +41,6 @@ var clientState = (function () {
      * Click handler - walk user through calibration steps
      */
     var userCalibration = function () {
-        calibrationCurrentStep = 'step1';
 
         if (calibrationCurrentStep === 'step1') {
 
@@ -59,16 +58,15 @@ var clientState = (function () {
 
         } else if (calibrationCurrentStep === 'step3') {
 
-            clientState.changeView('confirm');
+            changeView('confirm');
 
             calibrationSteps.step3.classList.remove('current-step');
             calibrationSteps.step1.classList.add('current-step');
 
+            sway.actions.calibrateComplete();
+            
             calibrationCurrentStep = 'step1';
         }
-
-
-
 
     };
 

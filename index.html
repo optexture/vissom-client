@@ -242,13 +242,24 @@
     <button onclick="sway.actions.calibrate()">dummy button to calibration</button>
 </section>
 
-<section id="calibrate">
+<section id="calibrate" class="calibrate">
     <header><div class="fpo">user shape</div></header>
-    <article>
-        <p>Okay! Let's get your device calibrated.</p>
-        <p>Please point your phone at the shape shown above and then click the button below.</p>
+    <article id="calibrate1" class="current-step">
+        <p>Let's get your device calibrated.</p>
+        <p>Look on the wall and find the shape shown above, Point your device at the shape, and then click the button below.</p>
     </article>
-    <nav><button onclick="sway.actions.calibrateComplete()">Continue</button></nav>
+
+    <article id="calibrate2">
+        <p>Great! Let's calibrate to a second point.</p>
+        <p>Find the shape on the wall, point at it, and then click the button.</p>
+    </article>
+
+    <article id="calibrate3">
+        <p>Just one more to go!</p>
+        <p>Please point your phone at your shape and then click the button below.</p>
+    </article>
+
+    <nav><button onclick="clientState.userCalibration()">Continue</button></nav>
 </section>
 
 <section id="confirm">
@@ -265,7 +276,7 @@
 <section id="play" class="play">
     <nav>
         <button onclick="clientState.changeView('quit')">Disconnect</button>
-        <button onclick="clientState.changeView('calibration')">Recalibrate</button>
+        <button onclick="clientState.changeView('calibrate')">Recalibrate</button>
     </nav>
 
     <article><button class="control active" onclick="paint()">Hold to paint</button></article>
@@ -283,9 +294,10 @@
 </section>
 
 <section id="disco">
-    <p>You've been disconnected due to inactivity. Thanks for playing!</p>
+    <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
-    <svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg>
+    <p>You've been disconnected due to inactivity. Thanks for playing with us!</p>
+
     <nav>
         <button onclick="clientState.changeView('info')">Want to learn more?</button>
         <button onclick="clientState.changeView('queue')">Want to play again?</button>
@@ -293,6 +305,10 @@
     </section>
 
 <section id="quit">
+    <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
+
+    <p>That was awesome. Thanks for playing with us!</p>
+
     <nav>
         <button onclick="clientState.changeView('info')">Want to learn more?</button>
         <button onclick="clientState.changeView('queue')">Want to play again?</button>
