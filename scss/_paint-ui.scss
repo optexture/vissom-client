@@ -1,12 +1,18 @@
 
 .play {
+  nav {
+    max-height: 30vh;
+  }
+
   article {
     width: 100%;
+    max-height: 50vh;
   }
 
   button.control {
-    @include setButtonColor($color-purple, 1.2em, $color-black);
+    @include setButtonColor($color-purple, 3.75vh, $color-black);
     padding: 4em 3em;
+    max-height: 40vh;
 
     transition: border-color 0.4s, box-shadow 0.3s;
 
@@ -26,6 +32,7 @@
   div.control {
     width: 100%;
     position: relative;
+    max-height: 15vh;
 
     label {
       display: block;
@@ -44,6 +51,7 @@
 
     input[type='range']::-webkit-slider-runnable-track {
       height: 5em;
+      max-height: 10vh;
       background-image: linear-gradient(to bottom right, #333, #333 50%, transparent 50%, transparent),linear-gradient(to left, $color-black 2px, transparent 0);
       background-size: 100% 100%, 8% 100%;
       background-position: right;
@@ -56,6 +64,7 @@
       border: 3px solid lighten($color-purple, 5%);
       border-radius: 1em;
       height: 7em;
+      max-height: 14vh;
       width: 5em;
       background: $color-purple;
     }
@@ -71,18 +80,20 @@
     justify-content: flex-end;
     width: 100%;
     margin-bottom: 2em;
+    max-height: 5vh;
+    font-size: 4vh;
 
     div {
+      &:first-of-type {
+        font-size: 80%;
+      }
+
       &:last-of-type {
         padding: 0;
         height: 1.5em;
         width: 1.5em;
 
         margin-left: 0.25em;
-        font: {
-          size: 2em;
-          weight: $weight-bold;
-        }
       }
     }
   }

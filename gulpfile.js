@@ -52,7 +52,7 @@ gulp.task('process-scss', function () {
         .pipe(sourcemaps.init({ loadMaps: true }))
         .pipe(sass().on('error', sass.logError))
         .pipe(sourcemaps.write())
-        // .pipe(autoprefixer({ browsers: ['last 2 versions', 'Android', 'iOS', 'and_chr', 'and_ff', 'ie_mob', 'bb'] }))
+         .pipe(autoprefixer({ browsers: ['last 2 versions', 'android > 2.1', 'ios > 3.2', 'and_chr > 30', 'and_ff > 40', 'ie_mob >= 10', 'bb >= 10', 'op_mob >= 12', 'op_mini >= 5'] }))
 
         //.pipe(gulp.dest(path.dest.build + 'css/'))
         .pipe(gulp.dest('css/'))

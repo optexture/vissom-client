@@ -35,6 +35,8 @@ section {
   opacity: 0;
 
   height: 100vh;
+  max-width: 23em;
+  margin: 0 auto;
   padding: 1.5em;
 
   &.current-state {
@@ -50,6 +52,7 @@ section {
 nav {
   flex-shrink: 0;
   width: 100%;
+  max-height: 10vh;
 
   display: flex;
   flex-direction: column;
@@ -58,6 +61,7 @@ nav {
 
 article {
   flex-grow: 1;
+  max-height: 90vh;
 
   display: flex;
   flex-direction: column;
