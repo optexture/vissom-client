@@ -8,25 +8,45 @@ svg.logo {
   fill: $color-white;
   stroke: $color-black;
   stroke-width: 3px;
-  margin-top: 2em;
+  margin-top: 2vh;
 }
 
 h1 {
   text-align: center;
+  //font-size: 5vh;
   flex-grow: 1;
   margin-top: 2em;
 }
 
 nav {
   button {
-    @include setButtonColor($button-color, 1.2em, $color-black);
+    @include setButtonColor($button-color, 3vh, $color-black);
+  }
+}
+
+.splash {
+  max-height: 100vh;
+
+  header {
+    max-height: 30vh;
+  }
+
+  h1 {
+    max-height: 40vh;
+  }
+
+  nav {
+    max-height: 30vh;
   }
 }
 
 .info {
+  height: auto;
+
   article {
-    margin-top: 1em;
+    margin-top: 2em;
     flex-grow: 1;
+    max-height: 300vh;
   }
 
   nav {
@@ -69,15 +89,24 @@ nav {
 }
 
 .calibrate {
+  header {
+    max-height: 25vh;
+  }
+
   article {
     margin-top: 2em;
     display: none;
+    max-height: 65vh;
 
     animation: slideInRight 0.5s ease-out forwards;
 
     &.current-step {
       display: block;
     }
+  }
+
+  nav {
+    max-height: 10vh;
   }
 }
 
