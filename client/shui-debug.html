@@ -12,7 +12,7 @@
         var 水 = {}; // TODO: remove soon
     </script>
     <script type="text/javascript" src="../lib/shui.deps.js"></script>
-    <script type="text/javascript" src="../lib/shui.js"></script>
+    <script type="text/javascript" src="../dist/shui.js"></script>
     <script type="text/javascript">
         var multicast = cosinedesign.toolbox.multicast;
     </script>
@@ -22,9 +22,13 @@
 
         var toolbox = cosinedesign.toolbox,
             delimiter = "|",
-            socket,
-            state = {};
+            socket;
         // register motion handlers
+
+        var state = {
+
+        };
+
 
         sway.oninitialized = multicast(function (res) {
             var channel = state.channel = res.channel;

@@ -18,10 +18,12 @@
         var multicast = cosinedesign.toolbox.multicast;
     </script>
     <script type="text/javascript">
+
         var toolbox = cosinedesign.toolbox,
             calibration = {
                 alphaOffset: 0
             },
+            channel,
             delimiter = "|",
             oPipe,
             socket,
@@ -31,16 +33,49 @@
             sway.config.url = 'http://192.168.1.10:1000';
 
         function paint() {
+            if (channel) {
+                socket.send(channel.name + delimiter + 'active' + delimiter + state.paint);
+            }
             state.paint = !state.paint;
+        }
+
+        function correctCompass(o) {
+            o.heading = o.webkitCompassHeading || o.alpha;
+            return o;
+        }
+
+        function showDebugData(el, o) {
+            var out = "<br>"
+                    + "alpha (yaw) " + o.alpha + "</br>"
+                    + "beta (pitch) " + o.beta + "</br>"
+                    + "gamma (roll) " + o.gamma + "</br>"
+                    + "absolute " + o.absolute + "</br>";
+
+            if (o.heading) {
+                out = out + "heading " + o.heading + "</br>"
+            }
+            if (o.webkitCompassHeading) {
+                out = out + "compass " + o.webkitCompassHeading + "</br>"
+            }
+            out += "</div>";
+
+            el.innerHTML = out;
+            return o;
         }
 
         // register motion handlers
         sway.oninitialized = multicast(function (res) {
-            var channel = state.channel = res.channel;
-            var plugin = channel[channel.plugin];
-            var orientation = plugin.orientation;
-            var inputConfig = plugin.input;
-
+            // TODO: if the user is not in a channel this crashes!
+            if (!res.channel) {
+                alert('user is not in a channel!');
+                return;
+            }
+            else {
+                channel = state.channel = res.channel;
+                var plugin = channel[channel.plugin];
+                var orientation = plugin.orientation;
+                var inputConfig = plugin.input;
+            }
             //sway.management.getTimer();
 
             // TODO: need a 'smoothing' pipe entry. Should accept a variance / threshold to stick to. Or maybe max delta?
@@ -49,16 +84,11 @@
             //  -
 
             //oPipe.next(showObject);
-            socket = state.socket = new sway.Socket({ address: inputConfig.address + ':' + inputConfig.port });
+            socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
             socket.connect();
 
             // orientation pipe
             oPipe = toolbox.pipe(showObject);
-            // TODO: add calibration handler
-            oPipe.add(function (o) {
-                // this is going to be o.alpha = o.alpha - calibration.alphaOffset;
-                return o;
-            });
             oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'scale', orientation));
             oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'ratioPolar', orientation));
 
@@ -66,18 +96,16 @@
             var sendPipe = toolbox.pipe(function (data) {
                 if (!data) return;
                 // translate the data first into the socket packet
-                // TODO: make a more-compressed packet ... but for now...
-                socket.send(channel.name + delimiter + data.alpha + delimiter + data.beta + delimiter + data.gamma );
+                socket.send(channel.name + delimiter + data.alpha + delimiter + data.beta + delimiter + data.gamma);
                 //var packet = { channel: channel.name, orientation: data };
                 //socket.send(packet);
                 return data;
             });
 
             //sendPipe.next(showData);
-
             // add a throttle for sPipe
             var throttle = toolbox.throttle(sendPipe);
-            throttle.interval(250);
+            throttle.interval(40);
             // add the pipe to
             oPipe.next(throttle);
 
@@ -86,12 +114,12 @@
 
             function showData(o) {
                 var out = "<br>"
-                    + "Channel " + channel.name + "</br>"
-                    + "alpha (yaw) " + o.alpha + "</br>"
-                    + "beta (pitch) " + o.beta + "</br>"
-                    + "gamma (roll) " + o.gamma + "</br>"
-                    + "absolute " + o.absolute + "</br>"
-                    + "</div>";
+                        + "Channel " + channel.name + "</br>"
+                        + "alpha (yaw) " + o.alpha + "</br>"
+                        + "beta (pitch) " + o.beta + "</br>"
+                        + "gamma (roll) " + o.gamma + "</br>"
+                        + "absolute " + o.absolute + "</br>"
+                        + "</div>";
 
                 divOutput.innerHTML = out;
                 return o;
@@ -113,17 +141,16 @@
             // initialize motion
             // TODO: Should this be in an oninitialize event?
             shui.motion.init();
-
             //sway.management.updateTimer();
-
+            //alert('end initialized');
         });
 
         // new calibrate action
         // sway.actions.calibrate = function (data) {};
 
         // initialize sway (connects to server)
-        sway.init();
 
+        sway.init();
         // initialize sway-realtime
 
         // initialize shui pipeline
@@ -134,10 +161,53 @@
 //
 //        }
 
+        /**
+         * Click handler - walk user through calibration steps
+         */
+
+        var calibrationViews;
+
+        function calibrateViewNext () {
+            var c = calibrationViews;
+            switch (c.currentStep) {
+                case 'step1':
+                    calibration.heading1 = calibration.alpha;
+                    // TODO: show next position (send position message to sway)
+                    c.steps.step1.classList.remove('current-step');
+                    c.steps.step2.classList.add('current-step');
+                    c.currentStep = 'step2';
+                    break;
+                case 'step2':
+                    calibration.heading2 = calibration.alpha;
+                        // TODO: calc & show next position - heading90
+                    c.steps.step2.classList.remove('current-step');
+                    c.steps.step3.classList.add('current-step');
+                    c.currentStep = 'step3';
+                    break;
+                case 'step3':
+                        // TODO: record heading90 offset
+                    clientState.changeView('confirm');
+                    c.steps.step3.classList.remove('current-step');
+                    c.steps.step1.classList.add('current-step');
+                    sway.actions.calibrateComplete();
+                    c.currentStep = 'step1';
+            }
+        }
+
         sway.actions = {
             // Show the splashscreen for the installation
             "splash": function () {
+                calibrationViews = {
+                    debugAlpha: document.getElementById('debugAlpha'),
+                    currentStep: 'step1',
+                    steps: {
+                        step1: document.getElementById('calibrate1'),
+                        step2: document.getElementById('calibrate2'),
+                        step3: document.getElementById('calibrate3')
+                    }
+                };
                 clientState.changeView('splash');
+                //alert('splash viewable');
             },
             // Show info message
             "info": function () {
@@ -170,7 +240,11 @@
 
                 // add a pipe specific to calibration
                 var calPipe = toolbox.pipe(function (o) {
+                    correctCompass(o);
+                    showDebugData(calibrationViews.debugAlpha, o);
+                    //.innerText = o.alpha;
                     calibration.alpha = o.alpha;
+                    return o;
                 });
 
                 shui.motion.onOrientation = calPipe;
@@ -259,7 +333,8 @@
         <p>Please point your phone at your shape and then click the button below.</p>
     </article>
 
-    <nav><button onclick="clientState.userCalibration()">Continue</button></nav>
+    <div id="debugAlpha"></div>
+    <nav><button onclick="calibrateViewNext()">Continue</button></nav>
 </section>
 
 <section id="confirm">
@@ -276,7 +351,7 @@
 <section id="play" class="play">
     <nav>
         <button onclick="clientState.changeView('quit')">Disconnect</button>
-        <button onclick="clientState.changeView('calibrate')">Recalibrate</button>
+        <button onclick="sway.actions.calibrate()">Recalibrate</button>
     </nav>
 
     <article><button class="control active" onclick="paint()">Hold to paint</button></article>
