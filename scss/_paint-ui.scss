@@ -19,9 +19,7 @@
     &:active {
       border-color: lighten($color-purple, 20%);
       box-shadow: $color-white 0 0 0 2px;
-    }
 
-    &.active {
       animation-duration: 3s;
       animation-delay: 1s;
       animation-name: pulse;
@@ -46,15 +44,17 @@
     input[type='range'] {
       -webkit-appearance: none;
       width: 100%;
-      background-color: $color-white;
     }
 
     input[type='range']::-webkit-slider-runnable-track {
       height: 5em;
       max-height: 10vh;
-      background-image: linear-gradient(to bottom right, #333, #333 50%, transparent 50%, transparent),linear-gradient(to left, $color-black 2px, transparent 0);
+      box-shadow: -2px -1px 3px 2px $color-black;
+      background-image: linear-gradient(to bottom right, $color-black, $color-black 50%, transparent 50%, transparent),linear-gradient(to left, $color-black 2px, transparent 0);
       background-size: 100% 100%, 8% 100%;
       background-position: right;
+      //outline: 5px solid $color-black;
+
     }
 
     input[type='range']::-webkit-slider-thumb {
@@ -74,7 +74,7 @@
     }
   }
 
-  .user--shape {
+  .display-shape {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -84,16 +84,13 @@
     font-size: 4vh;
 
     div {
-      &:first-of-type {
-        font-size: 80%;
-      }
 
       &:last-of-type {
         padding: 0;
-        height: 1.5em;
-        width: 1.5em;
+        height: 3em;
+        width: 3em;
 
-        margin-left: 0.25em;
+        margin-left: 0.5em;
       }
     }
   }

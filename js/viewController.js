@@ -34,10 +34,23 @@ var clientState = (function () {
                 }
             });
     };
+    
+    var shapeHandler = function (shape, color) {
+        var i;
+        var shapeElements = document.querySelectorAll('.shape');
+        var svgns = 'http://www.w3.org/2000/svg';
+        var xlinkns = 'http://www.w3.org/1999/xlink';
 
+        for (i = 0; i < shapeElements.length; i++) {
+            var use = document.createElementNS(svgns, 'use');
+            use.setAttributeNS(xlinkns, 'href', 'vissom-shapes.svg#' + shape);
+            shapeElements[i].appendChild(use);
+            shapeElements[i].style.fill = color;
+        }
+    };
 
     return {
-        changeView: changeView
+        changeView: changeView,
+        shapeHandler: shapeHandler
     }
 })();
-

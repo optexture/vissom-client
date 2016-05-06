@@ -6,6 +6,7 @@
     <title>.: vissom :.</title>
 
     <link rel="stylesheet" href="css/main.css">
+    <!--<link rel="manifest" href="manifest.json">-->
 </head>
 <body>
     <script type="text/javascript" src="lib/engine.io.js"></script>
@@ -288,7 +289,6 @@
             },
             // Enter play state
             "play": function () {
-
                 clientState.changeView('play');
                 // Now assign the play pipe to the orientation handler
                 shui.motion.onOrientation = oPipe;
@@ -345,15 +345,16 @@
         <p>in line. We will get you painting as soon as we can!</p>
 
     </article>
-
-    <!-- button onclick="sway.actions.calibrate()">dummy button to calibration</button-->
 </section>
 
 <section id="calibrate" class="calibrate">
-    <header><div class="fpo">user shape</div></header>
+    <header>
+        <svg class="shape"></svg>
+    </header>
+
     <article id="calibrate1" class="current-step">
-        <p>Let's get your device calibrated.</p>
-        <p>Look on the wall and find the shape shown above, Point your device at the shape, and then click the button below.</p>
+        <p>Let's get your device calibrated!</p>
+        <p>Look on the wall and find the shape and color shown above. Point your device at the shape, and then click the button below.</p>
     </article>
 
     <article id="calibrate2">
@@ -372,9 +373,11 @@
 
 <section id="confirm">
     <article>
-        <p>Okay! We have calibrated your phone. The crosshair shows you where your brush is. Your shape is:</p>
+        <p>Okay! We have calibrated your phone. Remember, your color and shape is:</p>
 
-        <div style="display: flex; justify-content: center;"><div class="fpo">user shape</div></div>
+        <div class="user-shape">
+            <svg class="shape"></svg>
+        </div>
 
         <p>To paint: click and hold the <strong>paint</strong> button to create!</p>
     </article>
@@ -387,12 +390,16 @@
         <button onclick="sway.actions.calibrate()">Recalibrate</button>
     </nav>
 
-    <article><button class="control active" onclick="paint()">Hold to paint</button></article>
+    <article><button class="control" onclick="paint()">Hold to paint</button></article>
 
-    <div class="user--shape">
+    <div class="display-shape">
         <div>Your shape:</div>
-        <div class="fpo"></div>
+
+        <div>
+            <svg class="shape"></svg>
+        </div>
     </div>
+
 
     <div class="control">
         <label for="dotSize">Dot Size</label>
@@ -401,7 +408,7 @@
 
 </section>
 
-<section id="disco">
+<section id="disco" class="end">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <p>You've been disconnected due to inactivity. Thanks for playing with us!</p>
@@ -410,9 +417,9 @@
         <button onclick="clientState.changeView('info')">Want to learn more?</button>
         <button onclick="clientState.changeView('queue')">Want to play again?</button>
     </nav>
-    </section>
+</section>
 
-<section id="quit">
+<section id="quit" class="end">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <p>That was awesome. Thanks for playing with us!</p>
@@ -425,5 +432,14 @@
 
 <script type="text/javascript" src="js/viewController.js"></script>
 
+<script>
+
+    clientState.shapeHandler('star', '#f0f');
+
+    var lockFunction =  window.screen.orientation.lock;
+
+    lockFunction.call(window.screen.orientation, 'portrait');
+
+</script>
 </body>
 </html>
