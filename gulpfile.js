@@ -28,7 +28,9 @@ gulp.task('serve-browsersync', function () {
         port: 3000,
         server: {
             //baseDir: path.dest.build
-        }
+        },
+        logConnections: true,
+        reloadOnRestart: true
     });
 });
 
