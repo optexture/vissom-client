@@ -16,8 +16,9 @@ svg {
   }
 
   &.shape {
-    fill: $color-white;
-    stroke: none;
+    fill: none;
+    stroke: $color-white;
+    stroke-width: 5;
   }
 }
 

@@ -34,23 +34,56 @@ var clientState = (function () {
                 }
             });
     };
-    
-    var shapeHandler = function (shape, color) {
+
+    /**
+     * called by input slider; reports the new value selected by the user
+     */
+    var newDotSize = function (event) {
+        console.log(event.target.value);
+    };
+
+    /**
+     * matches up index value received from sway and returns the associated shape name. helper function for shapeHandler()
+     * 
+     * @param id number
+     * @returns {string} color name
+     */
+    var shapeDictionary = function (id) {
+        var shapeList = [
+            'square',
+            'triangle',
+            'circle',
+            'hexagon',
+            'cross',
+            'star'
+        ];
+        
+        return shapeList[id];
+    };
+
+    /**
+     * accepts shape and color information from sway, and updates the ui with the appropriate svg
+     * @param shapeIndex value to look up in shape dictionary
+     * @param color rgb value
+     */
+    var shapeHandler = function (shapeIndex, color) {
         var i;
         var shapeElements = document.querySelectorAll('.shape');
         var svgns = 'http://www.w3.org/2000/svg';
         var xlinkns = 'http://www.w3.org/1999/xlink';
+        var shapeName = shapeDictionary(shapeIndex);
 
         for (i = 0; i < shapeElements.length; i++) {
             var use = document.createElementNS(svgns, 'use');
-            use.setAttributeNS(xlinkns, 'href', 'vissom-shapes.svg#' + shape);
+            use.setAttributeNS(xlinkns, 'href', 'vissom-shapes.svg#' + shapeName);
             shapeElements[i].appendChild(use);
-            shapeElements[i].style.fill = color;
+            shapeElements[i].style.stroke = 'rgb(' + color + ')';
         }
     };
 
     return {
         changeView: changeView,
-        shapeHandler: shapeHandler
+        shapeHandler: shapeHandler,
+        newDotSize: newDotSize
     }
 })();

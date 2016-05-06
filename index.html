@@ -301,7 +301,7 @@
     </script>
 
 
-<section id="splash" class="splash current-state">
+<section id="splash" class="splash">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <h1>Welcome to Visualize Somerville 2</h1>
@@ -339,7 +339,7 @@
                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
             </svg>
 
-            <div id="queueCount" class="queue--number">5</div>
+            <div id="queueCount" class="queue--number"></div>
         </div>
 
         <p>in line. We will get you painting as soon as we can!</p>
@@ -384,7 +384,7 @@
     <nav><button onclick="clientState.changeView('play')">Let's start!</button></nav>
 </section>
 
-<section id="play" class="play">
+<section id="play" class="play current-state">
     <nav>
         <button onclick="clientState.changeView('quit')">Disconnect</button>
         <button onclick="sway.actions.calibrate()">Recalibrate</button>
@@ -403,7 +403,7 @@
 
     <div class="control">
         <label for="dotSize">Dot Size</label>
-        <input type="range" min="1" max="10" value="4" id="dotSize">
+        <input type="range" min="1" max="10" value="4" id="dotSize" onchange="clientState.newDotSize(event)">
     </div>
 
 </section>
@@ -434,11 +434,20 @@
 
 <script>
 
-    clientState.shapeHandler('star', '#f0f');
+    clientState.shapeHandler(4, '150,150,200');
 
-    var lockFunction =  window.screen.orientation.lock;
 
-    lockFunction.call(window.screen.orientation, 'portrait');
+//    if (typeof window.screen.orientation.lock === 'function') {
+//        console.log('exists');
+//    } else {
+//        console.log('no');
+
+//    if (window.screen.orientation.hasOwnProperty(lock)) {
+//        var lockFunction =  window.screen.orientation.lock;
+//        lockFunction.call(window.screen.orientation, 'portrait');
+//        window.screen.orientation.lock('portrait');
+//    }
+//console.log(window.screen);
 
 </script>
 </body>
