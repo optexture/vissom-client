@@ -22,9 +22,14 @@
 
         var toolbox = cosinedesign.toolbox,
             calibration = {
-                alphaOffset: 0
+                alphaOffset: 0,
+                events: {
+                    absolute: ('ondeviceorientationabsolute' in window),
+                    relative: ('ondeviceorientation' in window)
+                }
             },
             channel,
+            queue,
             delimiter = "|",
             oPipe,
             socket,
@@ -52,8 +57,23 @@
                     + "gamma (roll) " + o.gamma + "</br>"
                     + "absolute " + o.absolute + "</br>";
 
+            if (o.events.absolute) {
+                out = out + "Absolute Events</br>"
+            }
+            if (o.events.relative) {
+                out = out + "Relative Events</br>"
+            }
             if (o.heading) {
                 out = out + "heading " + o.heading + "</br>"
+            }
+            if (o.heading1) {
+                out = out + "heading1 " + o.heading1 + "</br>"
+            }
+            if (o.heading2) {
+                out = out + "heading2 " + o.heading2 + "</br>"
+            }
+            if (o.heading90) {
+                out = out + "heading90 " + o.heading90 + "</br>"
             }
             if (o.webkitCompassHeading) {
                 out = out + "compass " + o.webkitCompassHeading + "</br>"
@@ -64,25 +84,30 @@
             return o;
         }
 
-        // register motion handlers
-        sway.oninitialized = multicast(function (res) {
-            // TODO: if the user is not in a channel this crashes!
-            if (!res.channel) {
-                alert('user is not in a channel!');
-                return;
-            }
-            else {
-                channel = state.channel = res.channel;
-                var plugin = channel[channel.plugin];
-                var orientation = plugin.orientation;
-                var inputConfig = plugin.input;
-            }
-            //sway.management.getTimer();
+        function updateQueue(queue) {
+            var q = state.queue = queue;
+            state.elQueueCount = state.elQueueCount || document.getElementById('queueCount');
+            state.elQueueCount.innerText = q.count;
+        }
 
-            // TODO: need a 'smoothing' pipe entry. Should accept a variance / threshold to stick to. Or maybe max delta?
-            // shui pipe should:
-            //  - throttle and/or smooth
-            //  -
+        // Listen for queue update messages
+        sway.api.onQueueChange.add(function (res) {
+            if (res.queue) updateQueue(res.queue);
+        });
+
+        // Listen for queue update messages
+        sway.api.onChannelChange.add(function (res) {
+            if (state.queued) {
+                state.queued = false;
+                if (res.channel) initializeChannel(res.channel);
+            }
+        });
+        // Done whenver we get our channel
+        function initializeChannel (channel) {
+            state.channel = channel;
+            var plugin = channel[channel.plugin];
+            var orientation = plugin.orientation;
+            var inputConfig = plugin.input;
 
             //oPipe.next(showObject);
             socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
@@ -92,6 +117,11 @@
             oPipe = toolbox.pipe(showObject);
             oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'scale', orientation));
             oPipe.add(shui.pipeline.buildHandlersForInput(shui.pipeline.plugins, 'ratioPolar', orientation));
+
+            function showObject(o) {
+                //divInput.innerHTML = JSON.stringify(o);
+                return o;
+            }
 
             // add a send-to-sway-realtime handler/pipe
             var sendPipe = toolbox.pipe(function (data) {
@@ -110,57 +140,28 @@
             // add the pipe to
             oPipe.next(throttle);
 
-            // TODO: add a timing handler
-            // TODO: add an output handler
-
-            function showData(o) {
-                var out = "<br>"
-                        + "Channel " + channel.name + "</br>"
-                        + "alpha (yaw) " + o.alpha + "</br>"
-                        + "beta (pitch) " + o.beta + "</br>"
-                        + "gamma (roll) " + o.gamma + "</br>"
-                        + "absolute " + o.absolute + "</br>"
-                        + "</div>";
-
-                divOutput.innerHTML = out;
-                return o;
-            }
-
-            function clearData(o) {
-                divOutput.innerHTML = '';
-                return o;
-            }
-
-            function showObject(o) {
-                //divInput.innerHTML = JSON.stringify(o);
-                return o;
-            }
-
-            // register pipe as motion handler
-            //shui.motion.onOrientation = oPipe;
-
-            // initialize motion
-            // TODO: Should this be in an oninitialize event?
             shui.motion.init();
-            //sway.management.updateTimer();
-            //alert('end initialized');
+
+            if (state.queued) sway.actions.calibrate();
+        }
+
+
+        // register motion handlers
+        sway.oninitialized = multicast(function (res) {
+            // TODO: if the user is not in a channel this crashes!
+            if (res.channel) {
+                initializeChannel(res.channel);
+            } else {
+                if (res.queue) {
+                    queue = state.queue = res.queue;
+                    updateQueue(queue);
+                }
+            }
+            //sway.management.getTimer();
         });
 
-        // new calibrate action
-        // sway.actions.calibrate = function (data) {};
-
         // initialize sway (connects to server)
-
         sway.init();
-        // initialize sway-realtime
-
-        // initialize shui pipeline
-
-        // Sway needs to send us config information on what data we're sending, and where.
-        // event->throttle->transform->send
-//        function createPipeline(dataConfig) {
-//
-//        }
 
         /**
          * Click handler - walk user through calibration steps
@@ -172,14 +173,15 @@
             var c = calibrationViews;
             switch (c.currentStep) {
                 case 'step1':
-                    calibration.heading1 = calibration.alpha;
+                    calibration.heading1 = calibration.heading;
+                        alert('JIM GENERATE NEW POSITION HERE!');
                     // TODO: show next position (send position message to sway)
                     c.steps.step1.classList.remove('current-step');
                     c.steps.step2.classList.add('current-step');
                     c.currentStep = 'step2';
                     break;
                 case 'step2':
-                    calibration.heading2 = calibration.alpha;
+                    calibration.heading2 = calibration.heading;
                         // TODO: calc & show next position - heading90
                     c.steps.step2.classList.remove('current-step');
                     c.steps.step3.classList.add('current-step');
@@ -187,6 +189,8 @@
                     break;
                 case 'step3':
                         // TODO: record heading90 offset
+                    alert('JIM GENERATE 90 POSITION HERE!');
+                    calibration.heading90 = calibration.heading;
                     clientState.changeView('confirm');
                     c.steps.step3.classList.remove('current-step');
                     c.steps.step1.classList.add('current-step');
@@ -221,13 +225,14 @@
             // Select shape for the user
             //"shape": function () {},
             // Calibrate user into the system
-            "calibrate": function (data) {
+            "calibrate": function () {
                 // generate a position within space
                 var space = {
                     x: { min: 100, max: 240 },
                     y: { min: -20, max: 75 }
                 };
 
+                // Generate an initial calibration position
                 var spaceXSize = space.x.max - space.x.min;
                 var spaceXIntervals = spaceXSize / 10;
                 // take sway user id and multiply that by some increment within space x
@@ -241,14 +246,25 @@
 
                 // add a pipe specific to calibration
                 var calPipe = toolbox.pipe(function (o) {
-                    correctCompass(o);
-                    showDebugData(calibrationViews.debugAlpha, o);
+                    if (o) {
+                        correctCompass(o);
+                        calibration.compass = o.webkitCompassHeading;
+                        calibration.absolute = o.absolute;
+                        calibration.heading = o.heading;
+                        // slow this the eff down so we maybe can get the right values instead of a million DOM updates
+                        window.requestAnimationFrame(function () {
+                            showDebugData(calibrationViews.debugAlpha, calibration);
+                        });
+                    }
                     //.innerText = o.alpha;
-                    calibration.alpha = o.alpha;
+
                     return o;
                 });
 
-                shui.motion.onOrientation = calPipe;
+                var throttledPipe = toolbox.throttle(calPipe);
+                throttledPipe.interval(100);
+
+                shui.motion.onOrientation = throttledPipe;
             },
             "calibrateComplete": function () {
                 // Cut off the motion handler so the last value is now the calibration info.
@@ -261,7 +277,15 @@
 
             // Notify user that they are waiting
             "queue": function () {
-                //clientState.changeView('queue');
+                if (state.channel) {
+                    sway.actions.play();
+                    return;
+                }
+                if (state.queue) {
+                    state.queued = true;
+                    updateQueue(state.queue);
+                    clientState.changeView('queue');
+                }
             },
             // Enter play state
             "play": function () {
@@ -284,7 +308,7 @@
 
     <nav>
         <button onclick="clientState.changeView('info')">Want to learn more?</button>
-        <button onclick="sway.actions.play()">Want to play?</button>
+        <button onclick="sway.actions.queue()">Want to play?</button>
     </nav>
 </section>
 
@@ -315,7 +339,7 @@
                 <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
             </svg>
 
-            <div class="queue--number">5</div>
+            <div id="queueCount" class="queue--number">5</div>
         </div>
 
         <p>in line. We will get you painting as soon as we can!</p>
