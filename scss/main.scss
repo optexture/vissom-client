@@ -4,16 +4,26 @@
 @import "loader";
 @import 'paint-ui';
 
-svg.logo {
-  fill: $color-white;
-  stroke: $color-black;
-  stroke-width: 3px;
-  margin-top: 2vh;
+svg {
+  height: 100%;
+  width: 100%;
+
+  &.logo {
+    fill: $color-white;
+    stroke: $color-black;
+    stroke-width: 3px;
+    margin-top: 2vh;
+  }
+
+  &.shape {
+    fill: $color-white;
+    stroke: none;
+  }
 }
 
 h1 {
   text-align: center;
-  //font-size: 5vh;
+  font-size: 1.4em;
   flex-grow: 1;
   margin-top: 2em;
 }
@@ -28,11 +38,13 @@ nav {
   max-height: 100vh;
 
   header {
-    max-height: 30vh;
+    width: 100%;
+    text-align: center;
+    max-height: 35vh;
   }
 
   h1 {
-    max-height: 40vh;
+    max-height: 35vh;
   }
 
   nav {
@@ -77,17 +89,6 @@ nav {
   }
 }
 
-// todo: remove
-.fpo {
-  padding: 2em;
-  border: 2px solid $color-white;
-  background-color: #777;
-  color: $color-black;
-  font-weight: $weight-bold;
-
-  display: inline-block;
-}
-
 .calibrate {
   header {
     max-height: 25vh;
@@ -98,7 +99,7 @@ nav {
     display: none;
     max-height: 65vh;
 
-    animation: slideInRight 0.5s ease-out forwards;
+    animation: slideInUp 0.5s ease-out forwards;
 
     &.current-step {
       display: block;
@@ -110,8 +111,21 @@ nav {
   }
 }
 
+.end {
+  header {
+    max-height: 40vh;
+  }
 
-@keyframes slideInRight {
+  p {
+    max-height: 30vh;
+  }
+
+  nav {
+    max-height: 30vh;
+  }
+}
+
+@keyframes slideInUp {
   from {
     opacity: 0;
     visibility: hidden;
