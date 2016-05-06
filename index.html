@@ -28,6 +28,10 @@
                     relative: ('ondeviceorientation' in window)
                 }
             },
+            targets = {
+                x1: 0.2,
+                x2: 0.8
+            },
             channel,
             queue,
             delimiter = "|",
@@ -105,9 +109,9 @@
         // Done whenver we get our channel
         function initializeChannel (channel) {
             state.channel = channel;
-            var plugin = channel[channel.plugin];
-            var orientation = plugin.orientation;
-            var inputConfig = plugin.input;
+            var plugin = state.plugin = channel[channel.plugin];
+            var orientation = plugin.orientation,
+                inputConfig = plugin.input;
 
             //oPipe.next(showObject);
             socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
@@ -145,7 +149,6 @@
             if (state.queued) sway.actions.calibrate();
         }
 
-
         // register motion handlers
         sway.oninitialized = multicast(function (res) {
             // TODO: if the user is not in a channel this crashes!
@@ -174,8 +177,8 @@
             switch (c.currentStep) {
                 case 'step1':
                     calibration.heading1 = calibration.heading;
-                        alert('JIM GENERATE NEW POSITION HERE!');
-                    // TODO: show next position (send position message to sway)
+                    // send generated position #2 (one ping only, please)
+                    socket.send(state.channel.name + delimiter + targets.x2 + delimiter + 45 + delimiter + 0 );
                     c.steps.step1.classList.remove('current-step');
                     c.steps.step2.classList.add('current-step');
                     c.currentStep = 'step2';
@@ -230,16 +233,17 @@
                 var space = {
                     x: { min: 100, max: 240 },
                     y: { min: -20, max: 75 }
-                };
+                },
+                    c = state.channel,
+                    d = delimiter;
 
-                // Generate an initial calibration position
-                var spaceXSize = space.x.max - space.x.min;
-                var spaceXIntervals = spaceXSize / 10;
-                // take sway user id and multiply that by some increment within space x
-                var targetX = spaceXIntervals * sway.user.channel.realtime.output.id;
+                // send size, shape, color
+                socket.send(state.channel.name + d + 'size' + d + 4);
+                socket.send(state.channel.name + d + 'shape' + d + c.shape);
+                socket.send(state.channel.name + d + 'color' + d + (c.color.r / 255) + d + (c.color.g / 255) + d + (c.color.b / 255));
 
-                // send generated position (one ping only, please)
-                socket.send(state.channel.name + delimiter + targetX + delimiter + 45 + delimiter + 0 );
+                // send generated position 1 (one ping only, please)
+                socket.send(state.channel.name + delimiter + targets.x1 + delimiter + 45 + delimiter + 0 );
 
                 // Make calibrate notification visible
                 clientState.changeView('calibrate');
@@ -256,7 +260,6 @@
                             showDebugData(calibrationViews.debugAlpha, calibration);
                         });
                     }
-                    //.innerText = o.alpha;
 
                     return o;
                 });
