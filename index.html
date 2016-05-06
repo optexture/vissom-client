@@ -439,18 +439,9 @@
 
     clientState.shapeHandler(4, '150,150,200');
 
+    var lock = window.screen.orientation.lock('portrait');
+    lock.catch(function () {});
 
-//    if (typeof window.screen.orientation.lock === 'function') {
-//        console.log('exists');
-//    } else {
-//        console.log('no');
-
-//    if (window.screen.orientation.hasOwnProperty(lock)) {
-//        var lockFunction =  window.screen.orientation.lock;
-//        lockFunction.call(window.screen.orientation, 'portrait');
-//        window.screen.orientation.lock('portrait');
-//    }
-//console.log(window.screen);
 
 </script>
 </body>
