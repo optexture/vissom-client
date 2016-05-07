@@ -18,6 +18,9 @@
     <script type="text/javascript">
         var multicast = cosinedesign.toolbox.multicast;
     </script>
+
+    <!-- question: is this ok here? will clientSdtate.newDotSize still work with this script here? -->
+    <script type="text/javascript" src="js/viewController.js"></script>
     <script type="text/javascript">
 
         var toolbox = cosinedesign.toolbox,
@@ -157,7 +160,12 @@
 
             shui.motion.init();
 
-            if (state.queued) sway.actions.calibrate();
+//            if (state.queued) sway.actions.calibrate();
+
+            if (state.queued) {
+                clientState.bypassCalibration ? sway.actions.confirm() : sway.actions.calibrate();
+            }
+
         }
 
         // register motion handlers
@@ -229,14 +237,33 @@
                 clientState.changeView('splash');
                 //alert('splash viewable');
             },
-            // Show info message
+            // Show project description/artist statement screen
             "info": function () {
                 clientState.changeView('info');
             },
-            // Confirm user wants to join
-            "confirm": function () {
-                clientState.changeView('confirm');
+
+            // Notify user that they are waiting
+            "queue": function () {
+                if (state.channel) {
+
+                    if (clientState.bypassCalibration)
+                    {
+                        sway.actions.confirm();
+                        return;
+                    }
+                    else {
+                        sway.actions.calibrate();
+
+                        return;
+                    }
+                }
+                if (state.queue) {
+                    state.queued = true;
+                    updateQueue(state.queue);
+                    clientState.changeView('queue');
+                }
             },
+
             // Select shape for the user
             //"shape": function () {},
             // Calibrate user into the system
@@ -287,31 +314,32 @@
             "calibrateComplete": function () {
                 // Cut off the motion handler so the last value is now the calibration info.
                 shui.motion.onOrientation = function () {};
-                sway.actions.play();
+                sway.actions.confirm();
             },
             // Calibration
             // - we put one shape onscreen at targetX1; record that angle.
             // - we put same shape at targetX2; record that angle.
 
-            // Notify user that they are waiting
-            "queue": function () {
-                if (state.channel) {
-                    sway.actions.calibrate();
-                    return;
-                }
-                if (state.queue) {
-                    state.queued = true;
-                    updateQueue(state.queue);
-                    clientState.changeView('queue');
-                }
+            // display shape and brief instruction to user before user clicks "start" button to begin playing
+            "confirm": function () {
+                var userInstruction = document.getElementById('userInstruction');
+
+                clientState.bypassCalibration ?
+                    userInstruction.innerText = "Okay, you're ready to paint! Your cursor's color and shape is:" :
+                    userInstruction.innerText = "Okay! We've calibrated your phone and you're ready to paint. Remember, your color and shape is:";
+
+                clientState.changeView('confirm');
             },
+
             // Enter play state
             "play": function () {
                 clientState.changeView('play');
+
+                sway.actions.play();
                 // Now assign the play pipe to the orientation handler
                 shui.motion.onOrientation = oPipe;
             },
-            // Quit the interation
+            // Quit the interaction
             "quit": function () {
                 clientState.changeView('quit');
             }
@@ -319,24 +347,24 @@
     </script>
 
 
-<section id="splash" class="splash current-state">
+<section id="splash" class="splash">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <h1>Welcome to Visualize Somerville 2</h1>
 
     <nav>
-        <button onclick="clientState.changeView('info')">Want to learn more?</button>
+        <button onclick="sway.actions.info()">Want to learn more?</button>
         <button onclick="sway.actions.queue()">Want to play?</button>
     </nav>
 </section>
 
 <section id="info" class="info">
     <article>
-        <p>Visualize Somerville 2 (#VisSom2) combines technology, activity, and community into a large scale interactive installation. This event was hatched by the group <strong>Optexture</strong>, a thinktank of dreamers, coders, makers, and futurists.</p>
+        <p><strong>Visualize Somerville 2</strong> (#VisSom2) combines technology, activity, and community into a large scale interactive installation. This event was hatched by the group <strong>Optexture</strong>: a think tank of dreamers, coders, makers, and futurists.</p>
 
         <p>We created Visualize Somerville last year, and this year have upped the ante by providing interactivity for all participants.</p>
 
-        <p><em>Visualize Somerville 2 is the attempt to disrupt our views of current-day technology.</em></p>
+        <p><strong class="highlight">Visualize Somerville 2 is the attempt to disrupt our views of current day technology.</strong></p>
 
         <p>Everyone uses their personal devices, Ipads, smartphones, to keep connected like never before. But this also has a downside, as we also get lost in our own world and forget the world around you. How many of us have turned to our phones when we are traveling? Nervous?</p>
 
@@ -345,7 +373,7 @@
         <p>This is also a Masters Capstone project for a member of Optexture (Jon MacLeod). Thank you for coming, and enjoy!</p>
     </article>
 
-    <nav><button onclick="clientState.changeView('splash')">Continue</button></nav>
+    <nav><button onclick="clientState.splash()">Continue</button></nav>
 </section>
 
 <section id="queue" class="queue">
@@ -391,21 +419,21 @@
 
 <section id="confirm">
     <article>
-        <p>Okay! We have calibrated your phone. Remember, your color and shape is:</p>
+        <p id="userInstruction"></p>
 
         <div class="user-shape">
             <svg class="shape"></svg>
         </div>
 
-        <p>To paint: click and hold the <strong>paint</strong> button to create!</p>
+        <p>To paint: on the next screen, click and hold the <strong>paint</strong> button to create! You'll also be able to adjust your brush size.</p>
     </article>
-    <nav><button onclick="clientState.changeView('play')">Let's start!</button></nav>
+    <nav><button onclick="sway.actions.play()">Let's start!</button></nav>
 </section>
 
-<section id="play" class="play">
+<section id="play" class="play current-state">
     <nav>
-        <button onclick="clientState.changeView('quit')">Disconnect</button>
-        <button onclick="sway.actions.calibrate()">Recalibrate</button>
+        <button onclick="sway.actions.quit()">End session</button>
+        <!--<button onclick="sway.actions.calibrate()">Recalibrate</button>-->
     </nav>
 
     <article><button id="paintButton" class="control">Hold to paint</button></article>
@@ -419,7 +447,7 @@
     </div>
 
     <div class="control">
-        <label for="dotSize">Dot Size</label>
+        <label for="dotSize">Brush Size</label>
         <input type="range" min="1" max="10" value="4" id="dotSize" onchange="clientState.newDotSize(event)">
     </div>
 
@@ -431,8 +459,8 @@
     <p>You've been disconnected due to inactivity. Thanks for playing with us!</p>
 
     <nav>
-        <button onclick="clientState.changeView('info')">Want to learn more?</button>
-        <button onclick="clientState.changeView('queue')">Want to play again?</button>
+        <button onclick="sway.actions.info()">Want to learn more?</button>
+        <button onclick="sway.actions.queue()">Want to play again?</button>
     </nav>
 </section>
 
@@ -442,12 +470,10 @@
     <p>That was awesome. Thanks for playing with us!</p>
 
     <nav>
-        <button onclick="clientState.changeView('info')">Want to learn more?</button>
-        <button onclick="clientState.changeView('queue')">Want to play again?</button>
+        <button onclick="sway.actions.info()">Want to learn more?</button>
+        <button onclick="sway.actions.queue()">Want to play again?</button>
     </nav>
 </section>
-
-<script type="text/javascript" src="js/viewController.js"></script>
 
 <script>
     // lock display orientation to portrait mode, if possible

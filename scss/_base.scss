@@ -29,6 +29,11 @@ p {
   text-align: center;
 }
 
+strong.highlight {
+  color: $color-turquoise;
+  font-size: larger;
+}
+
 section {
   display: none;
   visibility: hidden;
