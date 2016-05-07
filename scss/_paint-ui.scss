@@ -6,7 +6,7 @@
 
   article {
     width: 100%;
-    max-height: 50vh;
+    max-height: 40vh;
   }
 
   button.control {
@@ -79,16 +79,19 @@
     align-items: center;
     justify-content: flex-end;
     width: 100%;
-    margin-bottom: 2em;
-    max-height: 5vh;
-    font-size: 4vh;
+    margin-bottom: 2vh;
+    height: 10vh;
 
     div {
+      &:first-of-type {
+        font-size: larger;
+        opacity: 0.8;
+        margin-bottom: 0.25em;
+      }
 
       &:last-of-type {
-        padding: 0;
-        height: 4em;
-        width: 4em;
+        height: inherit;
+        width: 12vh;
 
         margin-left: 0.5em;
       }
