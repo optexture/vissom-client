@@ -37,14 +37,15 @@
             delimiter = "|",
             oPipe,
             socket,
+            useEngineIO = false,
             state = {
                 paint: false // set to true for active painting
             };
-            sway.config.url = 'http://192.168.1.240:1000';
+            sway.config.url = 'http://192.168.1.10:1000';
 
         function paint() {
             if (channel) {
-                socket.send(channel.name + delimiter + 'active' + delimiter + state.paint);
+                state.socket.send(channel.name + delimiter + 'active' + delimiter + state.paint);
             }
             state.paint = !state.paint;
         }
@@ -106,6 +107,16 @@
                 if (res.channel) initializeChannel(res.channel);
             }
         });
+
+        function initializeSocket (inputConfig) {
+            if (useEngineIO) {
+                socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
+                socket.connect();
+                return;
+            }
+            return state.socket = new sway.WebSocket({address: 'ws://' + inputConfig.address + ':' + inputConfig.port});
+        }
+
         // Done whenver we get our channel
         function initializeChannel (channel) {
             state.channel = channel;
@@ -114,8 +125,8 @@
                 inputConfig = plugin.input;
 
             //oPipe.next(showObject);
-            socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
-            socket.connect();
+            socket = initializeSocket(inputConfig);
+
 
             // orientation pipe
             oPipe = toolbox.pipe(showObject);
@@ -151,6 +162,7 @@
 
         // register motion handlers
         sway.oninitialized = multicast(function (res) {
+            sway.user.setHeartbeat();
             // TODO: if the user is not in a channel this crashes!
             if (res.channel) {
                 initializeChannel(res.channel);
