@@ -16,7 +16,7 @@
 
     transition: border-color 0.4s, box-shadow 0.3s;
 
-    &:active {
+    &:active, &.active {
       border-color: lighten($color-purple, 20%);
       box-shadow: $color-white 0 0 0 2px;
 
@@ -53,8 +53,6 @@
       background-image: linear-gradient(to bottom right, $color-black, $color-black 50%, transparent 50%, transparent),linear-gradient(to left, $color-black 2px, transparent 0);
       background-size: 100% 100%, 8% 100%;
       background-position: right;
-      //outline: 5px solid $color-black;
-
     }
 
     input[type='range']::-webkit-slider-thumb {

@@ -64,7 +64,7 @@ var clientState = (function () {
     /**
      * accepts shape and color information from sway, and updates the ui with the appropriate svg
      * @param shapeIndex value to look up in shape dictionary
-     * @param color rgb value
+     * @param color global var with config info
      */
     var shapeHandler = function (shapeIndex, color) {
         var i;
@@ -77,13 +77,41 @@ var clientState = (function () {
             var use = document.createElementNS(svgns, 'use');
             use.setAttributeNS(xlinkns, 'href', 'vissom-shapes.svg#' + shapeName);
             shapeElements[i].appendChild(use);
-            shapeElements[i].style.stroke = 'rgb(' + color + ')';
+            shapeElements[i].style.stroke = 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
         }
+    };
+
+    /**
+     * apply event handlers to "paint" button to provide visual feedback for the user
+     */
+    var pressEvents = function () {
+        var button = document.getElementById('paintButton');
+        var timer;
+
+        var touchStart = function (e) {
+            e.preventDefault();
+            window.setTimeout(timer, 400);
+
+            this.classList.add('active');
+        };
+
+        var touchEnd = function () {
+            clearTimeout(timer);
+
+            this.classList.remove('active');
+        };
+
+        button.addEventListener('mousedown', touchStart, false);
+        button.addEventListener('touchstart', touchStart, false);
+
+        button.addEventListener('mouseup', touchEnd, false);
+        button.addEventListener('touchend', touchEnd, false);
     };
 
     return {
         changeView: changeView,
         shapeHandler: shapeHandler,
-        newDotSize: newDotSize
+        newDotSize: newDotSize,
+        pressEvents: pressEvents
     }
 })();

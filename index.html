@@ -40,7 +40,7 @@
             state = {
                 paint: false // set to true for active painting
             };
-            sway.config.url = 'http://192.168.1.10:1000';
+//            sway.config.url = 'http://192.168.1.10:1000';
 
         function paint() {
             if (channel) {
@@ -234,7 +234,7 @@
                     x: { min: 100, max: 240 },
                     y: { min: -20, max: 75 }
                 },
-                    c = state.channel,
+                    c = state.channel.state,
                     d = delimiter;
 
                 // send size, shape, color
@@ -244,6 +244,9 @@
 
                 // send generated position 1 (one ping only, please)
                 socket.send(state.channel.name + delimiter + targets.x1 + delimiter + 45 + delimiter + 0 );
+
+                // create the user's shape
+                clientState.shapeHandler(c.shape, c.color);
 
                 // Make calibrate notification visible
                 clientState.changeView('calibrate');
@@ -304,7 +307,7 @@
     </script>
 
 
-<section id="splash" class="splash">
+<section id="splash" class="splash current-state">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <h1>Welcome to Visualize Somerville 2</h1>
@@ -387,13 +390,13 @@
     <nav><button onclick="clientState.changeView('play')">Let's start!</button></nav>
 </section>
 
-<section id="play" class="play current-state">
+<section id="play" class="play">
     <nav>
         <button onclick="clientState.changeView('quit')">Disconnect</button>
         <button onclick="sway.actions.calibrate()">Recalibrate</button>
     </nav>
 
-    <article><button class="control" onclick="paint()">Hold to paint</button></article>
+    <article><button id="paintButton" class="control" onclick="paint()">Hold to paint</button></article>
 
     <div class="display-shape">
         <div>Your shape:</div>
@@ -402,7 +405,6 @@
             <svg class="shape"></svg>
         </div>
     </div>
-
 
     <div class="control">
         <label for="dotSize">Dot Size</label>
@@ -436,13 +438,12 @@
 <script type="text/javascript" src="js/viewController.js"></script>
 
 <script>
-
-    clientState.shapeHandler(4, '150,150,200');
-
+    // lock display orientation to portrait mode, if possible
     var lock = window.screen.orientation.lock('portrait');
     lock.catch(function () {});
 
-
+    // apply event handlers to "paint" button
+    clientState.pressEvents();
 </script>
 </body>
 </html>
