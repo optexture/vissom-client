@@ -40,7 +40,7 @@
             state = {
                 paint: false // set to true for active painting
             };
-            sway.config.url = 'http://192.168.1.10:1000';
+            sway.config.url = 'http://192.168.1.240:1000';
 
         function paint() {
             if (channel) {
@@ -178,7 +178,7 @@
                 case 'step1':
                     calibration.heading1 = calibration.heading;
                     // send generated position #2 (one ping only, please)
-                    socket.send(state.channel.name + delimiter + targets.x2 + delimiter + 45 + delimiter + 0 );
+                    socket.send(state.channel.name + delimiter + targets.x2 + delimiter + .5 + delimiter + 0 );
                     c.steps.step1.classList.remove('current-step');
                     c.steps.step2.classList.add('current-step');
                     c.currentStep = 'step2';
@@ -234,7 +234,7 @@
                     x: { min: 100, max: 240 },
                     y: { min: -20, max: 75 }
                 },
-                    c = state.channel,
+                    c = state.channel.state,
                     d = delimiter;
 
                 // send size, shape, color
@@ -243,7 +243,7 @@
                 socket.send(state.channel.name + d + 'color' + d + (c.color.r / 255) + d + (c.color.g / 255) + d + (c.color.b / 255));
 
                 // send generated position 1 (one ping only, please)
-                socket.send(state.channel.name + delimiter + targets.x1 + delimiter + 45 + delimiter + 0 );
+                socket.send(state.channel.name + delimiter + targets.x1 + delimiter + .5 + delimiter + 0 );
 
                 // Make calibrate notification visible
                 clientState.changeView('calibrate');
@@ -272,7 +272,7 @@
             "calibrateComplete": function () {
                 // Cut off the motion handler so the last value is now the calibration info.
                 shui.motion.onOrientation = function () {};
-                clientState.changeView('queue');
+                sway.actions.play();
             },
             // Calibration
             // - we put one shape onscreen at targetX1; record that angle.
@@ -281,7 +281,7 @@
             // Notify user that they are waiting
             "queue": function () {
                 if (state.channel) {
-                    sway.actions.play();
+                    sway.actions.calibrate();
                     return;
                 }
                 if (state.queue) {
