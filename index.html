@@ -20,7 +20,7 @@
     </script>
 
     <!-- question: is this ok here? will clientSdtate.newDotSize still work with this script here? -->
-    <script type="text/javascript" src="js/viewController.js"></script>
+
     <script type="text/javascript">
 
         var toolbox = cosinedesign.toolbox,
@@ -40,14 +40,15 @@
             delimiter = "|",
             oPipe,
             socket,
+            useEngineIO = false,
             state = {
                 paint: false // set to true for active painting
             };
-            sway.config.url = 'http://192.168.1.240:1000';
+//            sway.config.url = 'http://192.168.1.10:1000';
 
         function paint() {
             if (channel) {
-                socket.send(channel.name + delimiter + 'active' + delimiter + state.paint);
+                state.socket.send(channel.name + delimiter + 'active' + delimiter + state.paint);
             }
             state.paint = !state.paint;
         }
@@ -109,6 +110,16 @@
                 if (res.channel) initializeChannel(res.channel);
             }
         });
+
+        function initializeSocket (inputConfig) {
+            if (useEngineIO) {
+                socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
+                socket.connect();
+                return;
+            }
+            return state.socket = new sway.WebSocket({address: 'ws://' + inputConfig.address + ':' + inputConfig.port});
+        }
+
         // Done whenver we get our channel
         function initializeChannel (channel) {
             state.channel = channel;
@@ -117,8 +128,8 @@
                 inputConfig = plugin.input;
 
             //oPipe.next(showObject);
-            socket = state.socket = new sway.Socket({address: inputConfig.address + ':' + inputConfig.port});
-            socket.connect();
+            socket = initializeSocket(inputConfig);
+
 
             // orientation pipe
             oPipe = toolbox.pipe(showObject);
@@ -159,6 +170,7 @@
 
         // register motion handlers
         sway.oninitialized = multicast(function (res) {
+            sway.user.setHeartbeat();
             // TODO: if the user is not in a channel this crashes!
             if (res.channel) {
                 initializeChannel(res.channel);
@@ -224,10 +236,13 @@
                 };
                 clientState.changeView('splash');
                 //alert('splash viewable');
+                console.log('splash');
+
             },
             // Show project description/artist statement screen
             "info": function () {
                 clientState.changeView('info');
+                console.log('info');
             },
 
             // Notify user that they are waiting
@@ -250,6 +265,8 @@
                     updateQueue(state.queue);
                     clientState.changeView('queue');
                 }
+
+                console.log('queue');
             },
 
             // Select shape for the user
@@ -298,11 +315,15 @@
                 throttledPipe.interval(100);
 
                 shui.motion.onOrientation = throttledPipe;
+
+                console.log('calibrate');
             },
             "calibrateComplete": function () {
                 // Cut off the motion handler so the last value is now the calibration info.
                 shui.motion.onOrientation = function () {};
                 sway.actions.confirm();
+
+                console.log('cal complete');
             },
             // Calibration
             // - we put one shape onscreen at targetX1; record that angle.
@@ -317,25 +338,27 @@
                     userInstruction.innerText = "Okay! We've calibrated your phone and you're ready to paint. Remember, your color and shape is:";
 
                 clientState.changeView('confirm');
+                console.log('confirm');
             },
 
             // Enter play state
             "play": function () {
                 clientState.changeView('play');
+                console.log('play');
 
-                sway.actions.play();
                 // Now assign the play pipe to the orientation handler
                 shui.motion.onOrientation = oPipe;
             },
             // Quit the interaction
             "quit": function () {
                 clientState.changeView('quit');
+                console.log('quit');
             }
         };
     </script>
 
 
-<section id="splash" class="splash">
+<section id="splash" class="splash current-state">
     <header><svg class="logo"><use xlink:href="vissom-logo.svg#logo"></use></svg></header>
 
     <h1>Welcome to Visualize Somerville 2</h1>
@@ -361,7 +384,7 @@
         <p>This is also a Masters Capstone project for a member of Optexture (Jon MacLeod). Thank you for coming, and enjoy!</p>
     </article>
 
-    <nav><button onclick="clientState.splash()">Continue</button></nav>
+    <nav><button onclick="sway.actions.splash()">Continue</button></nav>
 </section>
 
 <section id="queue" class="queue">
@@ -418,7 +441,7 @@
     <nav><button onclick="sway.actions.play()">Let's start!</button></nav>
 </section>
 
-<section id="play" class="play current-state">
+<section id="play" class="play">
     <nav>
         <button onclick="sway.actions.quit()">End session</button>
         <!--<button onclick="sway.actions.calibrate()">Recalibrate</button>-->
@@ -462,6 +485,7 @@
         <button onclick="sway.actions.queue()">Want to play again?</button>
     </nav>
 </section>
+    <script type="text/javascript" src="js/viewController.js"></script>
 
 <script>
     // lock display orientation to portrait mode, if possible
@@ -478,6 +502,14 @@
     clientState.onPaintStart = function () {
         if (state.socket) state.socket.send(state.channel.name + delimiter + 'active' + delimiter + 1);
     };
+
+    var colorObj = {
+        "r": 200,
+        "g": 100,
+        "b": 50
+    };
+
+    clientState.shapeHandler(3, colorObj);
 </script>
 </body>
 </html>
