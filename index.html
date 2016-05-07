@@ -20,7 +20,7 @@
     </script>
 
     <!-- question: is this ok here? will clientSdtate.newDotSize still work with this script here? -->
-    <script type="text/javascript" src="js/viewController.js"></script>
+
     <script type="text/javascript">
 
         var toolbox = cosinedesign.toolbox,
@@ -335,7 +335,7 @@
             "play": function () {
                 clientState.changeView('play');
 
-                sway.actions.play();
+                //sway.actions.play();
                 // Now assign the play pipe to the orientation handler
                 shui.motion.onOrientation = oPipe;
             },
@@ -430,7 +430,7 @@
     <nav><button onclick="sway.actions.play()">Let's start!</button></nav>
 </section>
 
-<section id="play" class="play current-state">
+<section id="play" class="play">
     <nav>
         <button onclick="sway.actions.quit()">End session</button>
         <!--<button onclick="sway.actions.calibrate()">Recalibrate</button>-->
@@ -474,7 +474,7 @@
         <button onclick="sway.actions.queue()">Want to play again?</button>
     </nav>
 </section>
-
+    <script type="text/javascript" src="js/viewController.js"></script>
 <script>
     // lock display orientation to portrait mode, if possible
     var lock = window.screen.orientation.lock('portrait');
