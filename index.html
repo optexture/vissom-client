@@ -396,7 +396,7 @@
         <button onclick="sway.actions.calibrate()">Recalibrate</button>
     </nav>
 
-    <article><button id="paintButton" class="control" onclick="paint()">Hold to paint</button></article>
+    <article><button id="paintButton" class="control">Hold to paint</button></article>
 
     <div class="display-shape">
         <div>Your shape:</div>
@@ -444,6 +444,14 @@
 
     // apply event handlers to "paint" button
     clientState.pressEvents();
+
+    clientState.onPaintEnd = function () {
+        if (state.socket) state.socket.send(state.channel.name + delimiter + 'active' + delimiter + 0);
+    };
+
+    clientState.onPaintStart = function () {
+        if (state.socket) state.socket.send(state.channel.name + delimiter + 'active' + delimiter + 1);
+    };
 </script>
 </body>
 </html>

@@ -90,15 +90,15 @@ var clientState = (function () {
 
         var touchStart = function (e) {
             e.preventDefault();
-            window.setTimeout(timer, 400);
-
+            timer = window.setTimeout(function () {}, 400);
             this.classList.add('active');
+            if (clientState.onPaintStart) clientState.onPaintStart();
         };
 
         var touchEnd = function () {
             clearTimeout(timer);
-
             this.classList.remove('active');
+            if (clientState.onPaintEnd) clientState.onPaintEnd();
         };
 
         button.addEventListener('mousedown', touchStart, false);
@@ -112,6 +112,8 @@ var clientState = (function () {
         changeView: changeView,
         shapeHandler: shapeHandler,
         newDotSize: newDotSize,
-        pressEvents: pressEvents
+        pressEvents: pressEvents,
+        onPaintStart: null,
+        onPaintEnd: null
     }
 })();
