@@ -13,7 +13,10 @@
     @include setButtonColor($color-purple, 3.75vh, $color-black);
     padding: 4em 3em;
     max-height: 40vh;
-
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     transition: border-color 0.4s, box-shadow 0.3s;
 
     &:active {

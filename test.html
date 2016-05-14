@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="output">hello world</div>
+    <script type="text/javascript">
+        var divout = document.getElementById('output');
+        function show(message) {
+            divout.innerHTML = message;
+        }
+
+        function formatOrientation(o) {
+            var output = 'alpha: ' + o.alpha + '<br/>' + 'absolute: ' + o.absolute + '<br/>';
+
+            if (o.webkitCompassHeading)
+            {
+
+                output+= 'heading: ' + o.webkitCompassHeading + '<br/>';
+            } else {
+                output+= 'no webkit ' + '<br/>';
+            }
+
+            return output;
+        }
+
+        if ("ondeviceorientation" in window) {
+            window.addEventListener('deviceorientation', function (e) {
+                show(formatOrientation(e));
+            });
+        } else {
+            show('no event');
+        }
+    </script>
+</body>
+</html>

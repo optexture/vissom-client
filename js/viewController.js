@@ -1,6 +1,5 @@
 var clientState = (function () {
     var sectionList = document.querySelectorAll('section');
-    var bypassCalibration = false;
 
     /**
      * Add `current-state` css class to the declared section of the application, and remove class from all others
@@ -40,7 +39,7 @@ var clientState = (function () {
      * called by input slider; sends the new value selected by the user to sway
      */
     var newDotSize = function (event) {
-        socket.send(state.channel.name + delimiter + 'size' + delimiter + event.target.value);
+        state.socket.send(state.channel.name + delimiter + 'size' + delimiter + event.target.value);
     };
 
     /**
@@ -114,7 +113,7 @@ var clientState = (function () {
         shapeHandler: shapeHandler,
         newDotSize: newDotSize,
         pressEvents: pressEvents,
-        bypassCalibration: bypassCalibration,
+        bypassCalibration: true,
         onPaintStart: null,
         onPaintEnd: null
     }
