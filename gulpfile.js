@@ -1,23 +1,24 @@
 var gulp = require('gulp');
-//var babel = require('gulp-babel');
 
 var autoprefixer = require('gulp-autoprefixer');
 var browserSync = require('browser-sync').create();
-//var concat = require('gulp-concat');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
-var Server = require('karma').Server;
 
 var path = {
     src: {
         styles: 'scss/**/*.scss',
-        js: ['src/**/*.js']
+        libs: 'lib/**/*.js',
+        js: ['js/**/*.js'],
+        svg: ['vissom-logo.svg', 'vissom-shapes.svg']
     },
 
     dest: {
         build: 'dist/'
     }
 };
+
+var apOptions = { browsers: ['last 2 versions', 'android > 2.1', 'ios > 3.2', 'and_chr > 30', 'and_ff > 40', 'ie_mob >= 10', 'bb >= 10', 'op_mob >= 12', 'op_mini >= 5'] };
 
 /**
  * launch local webserver
@@ -36,17 +37,6 @@ gulp.task('serve-browsersync', function () {
 
 
 /**
- * run tests once, and exit
- */
-gulp.task('run-karma', function (done) {
-    new Server({
-        configFile: __dirname + '/karma.conf.js',
-        singleRun: true
-    }, function () { done(); }).start();
-});
-
-
-/**
  * process scss
  */
 gulp.task('process-scss', function () {
@@ -54,9 +44,8 @@ gulp.task('process-scss', function () {
         .pipe(sourcemaps.init({ loadMaps: true }))
         .pipe(sass().on('error', sass.logError))
         .pipe(sourcemaps.write())
-         .pipe(autoprefixer({ browsers: ['last 2 versions', 'android > 2.1', 'ios > 3.2', 'and_chr > 30', 'and_ff > 40', 'ie_mob >= 10', 'bb >= 10', 'op_mob >= 12', 'op_mini >= 5'] }))
+        .pipe(autoprefixer(apOptions))
 
-        //.pipe(gulp.dest(path.dest.build + 'css/'))
         .pipe(gulp.dest('css/'))
 
         .pipe(browserSync.stream());
@@ -65,9 +54,6 @@ gulp.task('process-scss', function () {
 gulp.task('watch', function () {
     gulp.watch(path.src.styles, ['process-scss']);
 });
-
-// todo: concat and minify
-// todo: inject js/css inline into index.html ?
 
 gulp.task('default', ['process-scss', 'serve-browsersync', 'watch']);
 
@@ -91,4 +77,26 @@ gulp.task('copy-debug', function () {
             '../shui/client/shui-debug.html'
         ])
         .pipe(gulp.dest('client'));
+});
+
+/**
+ * Main build task
+ */
+gulp.task('build', function () {
+    gulp.src(path.src.libs)
+        .pipe(gulp.dest(path.dest.build + 'lib/'));
+
+    gulp.src(path.src.js)
+        .pipe(gulp.dest(path.dest.build + 'js/'));
+    
+    gulp.src(path.src.svg)
+        .pipe(gulp.dest(path.dest.build));
+    
+    gulp.src('index.html')
+        .pipe(gulp.dest(path.dest.build));
+
+    return gulp.src(path.src.styles)
+        .pipe(sass().on('error', sass.logError))
+        .pipe(autoprefixer(apOptions))
+        .pipe(gulp.dest(path.dest.build + 'css/'));
 });
