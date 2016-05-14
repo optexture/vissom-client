@@ -39,7 +39,7 @@ var clientState = (function () {
      * called by input slider; sends the new value selected by the user to sway
      */
     var newDotSize = function (event) {
-        socket.send(state.channel.name + delimiter + 'size' + delimiter + event.target.value);
+        state.socket.send(state.channel.name + delimiter + 'size' + delimiter + event.target.value);
     };
 
     /**

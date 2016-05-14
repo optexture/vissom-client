@@ -44,7 +44,7 @@
             state = {
                 paint: false // set to true for active painting
             };
-            sway.config.url = 'http://192.168.1.10:1000';
+            sway.config.url = 'http://192.168.1.240:1000';
 
         function paint() {
             if (channel) {
@@ -97,6 +97,10 @@
             state.elQueueCount = state.elQueueCount || document.getElementById('queueCount');
             state.elQueueCount.innerText = q.count;
         }
+
+        sway.api.onDie.add(function () {
+            sway.actions.quit();
+        });
 
         // Listen for queue update messages
         sway.api.onQueueChange.add(function (res) {
@@ -164,8 +168,9 @@
 
             if (state.queued) {
                 clientState.bypassCalibration ? sway.actions.confirm() : sway.actions.calibrate();
+            } else {
+                sway.actions.confirm();
             }
-
         }
 
         // register motion handlers
@@ -322,7 +327,21 @@
 
             // display shape and brief instruction to user before user clicks "start" button to begin playing
             "confirm": function () {
-                var userInstruction = document.getElementById('userInstruction');
+                var userInstruction = document.getElementById('userInstruction'),
+
+                c = state.channel.state,
+                        d = delimiter;
+
+
+                if (clientState.bypassCalibration) {
+                    socket.send(state.channel.name + d + 'size' + d + 4);
+                    socket.send(state.channel.name + d + 'shape' + d + c.shape);
+                    socket.send(state.channel.name + d + 'color' + d + (c.color.r / 255) + d + (c.color.g / 255) + d + (c.color.b / 255));
+
+                    // create the user's shape
+                    clientState.shapeHandler(c.shape, c.color);
+                }
+
 
                 clientState.bypassCalibration ?
                     userInstruction.innerText = "Okay, you're ready to paint! Your cursor's color and shape is:" :
@@ -341,6 +360,8 @@
             },
             // Quit the interaction
             "quit": function () {
+                shui.motion.onOrientation = function () {};
+                if (sway.heartbeat) window.clearInterval(sway.heartbeat);
                 clientState.changeView('quit');
             }
         };
@@ -373,12 +394,12 @@
         <p>This is also a Masters Capstone project for a member of Optexture (Jon MacLeod). Thank you for coming, and enjoy!</p>
     </article>
 
-    <nav><button onclick="clientState.splash()">Continue</button></nav>
+    <nav><button onclick="sway.actions.splash()">Continue</button></nav>
 </section>
 
 <section id="queue" class="queue">
     <article>
-        <p>There are a few people ahead of you right now. You are number</p>
+        <p>There are:</p>
 
         <div class="waiting">
             <svg class="circular" viewBox="25 25 50 50">
@@ -388,7 +409,7 @@
             <div id="queueCount" class="queue--number"></div>
         </div>
 
-        <p>in line. We will get you painting as soon as we can!</p>
+        <p>players waiting ahead of you. We will get you painting as soon as we can!</p>
 
     </article>
 </section>
@@ -477,9 +498,11 @@
     <script type="text/javascript" src="js/viewController.js"></script>
 <script>
     // lock display orientation to portrait mode, if possible
-    var lock = window.screen.orientation.lock('portrait');
-    lock.catch(function () {});
-
+    if (window.screen && window.orientation && window.orientation.lock) {
+        var lock = window.screen.orientation.lock('portrait');
+        lock.catch(function () {
+        });
+    }
     // apply event handlers to "paint" button
     clientState.pressEvents();
 
